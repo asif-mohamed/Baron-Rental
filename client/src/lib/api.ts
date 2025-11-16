@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// Get API URL from environment variable with fallback
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: `${API_BASE_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -27,5 +30,8 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Export API base URL for static file access
+export const getApiBaseUrl = () => API_BASE_URL;
 
 export default api;
