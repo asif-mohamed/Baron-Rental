@@ -1,16 +1,16 @@
 # Baron Car Rental Management System
 
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
-[![Platform: Asif](https://img.shields.io/badge/Platform-Asif-blue.svg)](https://github.com/asif-mohamed)
+[![Platform: Nexus](https://img.shields.io/badge/Platform-Nexus-blue.svg)](https://github.com/asif-mohamed)
 [![Status: Production Ready](https://img.shields.io/badge/Status-Production%20Ready-green.svg)]()
 
-**A complete multi-tenant SaaS car rental management system running on the Asif Platform**
+**A complete multi-tenant SaaS car rental management system running on the Nexus Platform**
 
 ---
 
 ## 🚗 Overview
 
-Baron is a comprehensive car rental management system built on a **multi-tenant SaaS architecture**. It leverages the **Asif Platform** for service orchestration, discovery, and routing, providing enterprise-grade fleet management, booking systems, and business operations.
+Baron is a comprehensive car rental management system built on a **multi-tenant SaaS architecture**. It leverages the **Nexus Platform** for service orchestration, discovery, and routing, providing enterprise-grade fleet management, booking systems, and business operations.
 
 ### Key Features
 
@@ -31,7 +31,7 @@ Baron is a comprehensive car rental management system built on a **multi-tenant 
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│         ASIF PLATFORM (Control Plane)               │
+│         NEXUS PLATFORM (Control Plane)              │
 │  • Service Discovery    • API Gateway               │
 │  • Health Monitoring    • WebSocket Server          │
 │  • SSH Source Access    • Config Sync               │
@@ -244,8 +244,8 @@ Default accounts created during seeding:
 ## 📂 Project Structure
 
 ```
-baron_on_Asif-platform/
-├── platform/                  # Asif Platform (Control Plane)
+baron_on_Nexus-platform/
+├── platform/                  # Nexus Platform (Control Plane)
 │   ├── src/
 │   │   ├── controllers/       # Platform API controllers
 │   │   ├── services/          # Background services
@@ -332,7 +332,7 @@ The Docker Compose setup includes:
 
 - **baron-postgres** - PostgreSQL 15 (Platform + Baron databases)
 - **baron-redis** - Redis 7 (Caching and sessions)
-- **asif-platform** - Platform control plane (Port 6000, 2222, 6001)
+- **nexus-platform** - Platform control plane (Port 6000, 2222, 6001)
 - **baron-backend** - Baron API server (Port 5000)
 - **baron-frontend** - Baron client app (Port 3000)
 
@@ -493,9 +493,9 @@ This is a proprietary project. Contributions are managed internally.
 
 **Proprietary License**
 
-- **Platform Owner:** Asif
+- **Platform Owner:** Nexus
 - **Business Instance:** Baron Car Rental Management System
-- **Platform:** Asif Platform (Multi-tenant SaaS Infrastructure)
+- **Platform:** Nexus Platform (Multi-tenant SaaS Infrastructure)
 
 This software is proprietary and confidential. Unauthorized copying, modification, distribution, or use is strictly prohibited.
 

@@ -1,6 +1,6 @@
 # ============================================================================
-# ASIF PLATFORM - Docker Compose Configuration
-# Platform Owner: Asif | Business License: Baron Car Rental
+# NEXUS PLATFORM - Docker Compose Configuration
+# Platform Owner: Nexus | Business License: Baron Car Rental
 # ============================================================================
 # Orchestrates: Platform, Baron Backend, Baron Frontend, PostgreSQL, Redis
 
@@ -53,13 +53,13 @@ services:
       retries: 5
 
   # ============================================================================
-  # ASIF PLATFORM - Control Plane
+  # NEXUS PLATFORM - Control Plane
   # ============================================================================
   platform:
     build:
       context: ./platform
       dockerfile: ${PLATFORM_DOCKERFILE:-Dockerfile}
-    container_name: asif-platform
+    container_name: nexus-platform
     restart: unless-stopped
     depends_on:
       postgres:
@@ -195,7 +195,7 @@ services:
       VITE_API_URL: http://localhost:${BACKEND_PORT:-5000}
       VITE_WS_URL: ws://localhost:${BACKEND_PORT:-5000}
       VITE_APP_NAME: Baron Car Rental
-      VITE_PLATFORM_NAME: Asif Platform
+      VITE_PLATFORM_NAME: Nexus Platform
     ports:
       - "${FRONTEND_PORT:-3000}:80"
     networks:

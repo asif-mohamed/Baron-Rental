@@ -1,6 +1,6 @@
 # ============================================================================
-# ASIF PLATFORM - Docker Setup Script
-# Platform Owner: Asif | Business License: Baron Car Rental
+# NEXUS PLATFORM - Docker Setup Script
+# Platform Owner: Nexus | Business License: Baron Car Rental
 # ============================================================================
 # This script sets up and runs the complete Baron platform using Docker Compose
 # 
@@ -66,8 +66,8 @@ function Write-Step {
 
 # Check prerequisites
 function Test-Prerequisites {
-    Write-Header "ASIF PLATFORM - Docker Setup"
-    Write-Host "Platform Owner: Asif | Business License: Baron Car Rental`n" -ForegroundColor Gray
+    Write-Header "NEXUS PLATFORM - Docker Setup"
+    Write-Host "Platform Owner: Nexus | Business License: Baron Car Rental`n" -ForegroundColor Gray
     
     Write-Step "Checking prerequisites..."
     
@@ -282,7 +282,7 @@ function Show-ServiceInfo {
     $backendPort = if ($env:BACKEND_PORT) { $env:BACKEND_PORT } else { "5000" }
     $frontendPort = if ($env:FRONTEND_PORT) { $env:FRONTEND_PORT } else { "3000" }
     
-    Write-Host "🌐 ASIF PLATFORM (Control Plane)" -ForegroundColor Cyan
+    Write-Host "🌐 NEXUS PLATFORM (Control Plane)" -ForegroundColor Cyan
     Write-Host "   HTTP API:   http://localhost:$platformPort" -ForegroundColor White
     Write-Host "   SSH Access: ssh admin@localhost -p $sshPort" -ForegroundColor White
     Write-Host "   WebSocket:  ws://localhost:$wsPort" -ForegroundColor White

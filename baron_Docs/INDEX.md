@@ -173,6 +173,6 @@ code INDEX.md  # Or use your preferred editor
 
 ---
 
-**Platform:** Asif Platform  
+**Platform:** Nexus Platform  
 **Business:** Baron Car Rental Management System  
 **Status:** Production Ready ✅

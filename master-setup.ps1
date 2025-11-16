@@ -1,6 +1,6 @@
 # ============================================================================
-# ASIF PLATFORM - MASTER SETUP SCRIPT
-# Platform Owner: Asif | Business License: Baron Car Rental
+# NEXUS PLATFORM - MASTER SETUP SCRIPT
+# Platform Owner: Nexus | Business License: Baron Car Rental
 # ============================================================================
 # Comprehensive setup orchestration:
 # 1. Initialization and path validation
@@ -82,8 +82,8 @@ function Write-SubHeader {
 # ============================================================================
 
 function Initialize-Setup {
-    Write-Header "ASIF PLATFORM - MASTER SETUP INITIALIZATION"
-    Write-Host "Platform Owner: Asif | Business License: Baron Car Rental`n" -ForegroundColor Gray
+    Write-Header "NEXUS PLATFORM - MASTER SETUP INITIALIZATION"
+    Write-Host "Platform Owner: Nexus | Business License: Baron Car Rental`n" -ForegroundColor Gray
     
     # Initialize log file
     if (Test-Path $Global:SetupLog) {
@@ -218,7 +218,7 @@ function Deploy-DockerInfrastructure {
         
         # Create default .env.docker
         $defaultEnv = @"
-# ASIF PLATFORM - Docker Environment
+# NEXUS PLATFORM - Docker Environment
 NODE_ENV=production
 POSTGRES_PASSWORD=postgres_secure_password
 REDIS_PASSWORD=redis_secure_password
@@ -227,7 +227,7 @@ PLATFORM_SSH_PORT=2222
 PLATFORM_WS_PORT=6001
 BACKEND_PORT=5000
 FRONTEND_PORT=3000
-PLATFORM_JWT_SECRET=asif-platform-jwt-secret-change-in-production
+PLATFORM_JWT_SECRET=nexus-platform-jwt-secret-change-in-production
 PLATFORM_SECRET=shared-secret-change-in-production
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=Admin123!@#Platform
@@ -279,7 +279,7 @@ LOG_LEVEL=info
             $containerName = switch ($service) {
                 "postgres" { "baron-postgres" }
                 "redis" { "baron-redis" }
-                "platform" { "asif-platform" }
+                "platform" { "nexus-platform" }
             }
             
             $maxAttempts = 30
@@ -441,7 +441,7 @@ function Initialize-EnvironmentFiles {
                     if ($envConfig.Name -eq "Platform Environment") {
                         Write-Log "Creating minimal platform .env file..." "WARNING"
                         $minimalEnv = @"
-# ASIF PLATFORM - Environment Configuration
+# NEXUS PLATFORM - Environment Configuration
 # Created automatically by master-setup.ps1
 
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/baron_platform"
@@ -450,7 +450,7 @@ SSH_PORT=2222
 WS_PORT=6001
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=Admin123!@#Platform
-JWT_SECRET=asif-platform-jwt-secret-change-in-production
+JWT_SECRET=nexus-platform-jwt-secret-change-in-production
 PLATFORM_SECRET=shared-secret-change-in-production
 ENABLE_SSH_SERVER=true
 ENABLE_WS_SERVER=true
@@ -921,7 +921,7 @@ $($service.Command)
     }
     
     Write-Log "All local services started" "SUCCESS"
-    Write-Log "Services are orchestrated by Asif Platform control plane" "INFO"
+    Write-Log "Services are orchestrated by Nexus Platform control plane" "INFO"
     
     return $true
 }

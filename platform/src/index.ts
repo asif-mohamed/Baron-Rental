@@ -49,7 +49,7 @@ import { logger } from './services/logger';
 // Platform Owner: Asif (Original Developer)
 // Business License: Baron Car Rental Management System
 // 
-// This is the ASIF platform layer that manages all Baron tenant instances
+// This is the NEXUS platform layer that manages all Baron tenant instances
 // The platform can be forked and customized by admin users who have
 // read-only SSH access to the source code.
 //
@@ -91,8 +91,8 @@ app.use(requestLogger);
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
-    service: 'asif-platform',
-    platform: 'Asif Platform',
+    service: 'nexus-platform',
+    platform: 'Nexus Platform',
     businessLicense: 'Baron Car Rental',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
@@ -102,8 +102,8 @@ app.get('/health', (req, res) => {
 
 app.get('/info', (req, res) => {
   res.json({
-    name: 'Asif Platform - Control Plane',
-    platformOwner: 'Asif',
+    name: 'Nexus Platform - Control Plane',
+    platformOwner: 'Nexus',
     businessLicense: 'Baron Car Rental Management System',
     version: '1.0.0',
     description: 'Multi-tenant SaaS management platform. Licensed for Baron Car Rental operations. Platform source code accessible via SSH for forking and local development.',
@@ -122,7 +122,7 @@ app.get('/info', (req, res) => {
       websocket: process.env.ENABLE_WS_SERVER !== 'false' ? `ws://${PLATFORM_HOST}:${WS_PORT}` : 'disabled',
     },
     branding: {
-      platform: 'Asif Platform (Original)',
+      platform: 'Nexus Platform',
       business: 'Baron Car Rental (Licensed Instance)',
       note: 'Admin users can SSH into platform to view source code for forking',
     },
@@ -244,7 +244,7 @@ healthMonitor.start();
 
 httpServer.listen(PLATFORM_PORT, () => {
   logger.info('='.repeat(80));
-  logger.info('🚀 ASIF PLATFORM - Multi-Tenant SaaS Control Plane');
+  logger.info('🚀 NEXUS PLATFORM - Multi-Tenant SaaS Control Plane');
   logger.info('   Business License: Baron Car Rental Management System');
   logger.info('='.repeat(80));
   logger.info(`Platform API: http://${PLATFORM_HOST}:${PLATFORM_PORT}`);
