@@ -1,0 +1,33 @@
+# ============================================================================
+# ASIF PLATFORM - Development Dockerfile
+# Platform Owner: Asif | Business License: Baron Car Rental
+# ============================================================================
+# Development container with hot-reload and debugging support
+
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Install development tools
+RUN apk add --no-cache git openssh-client
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies (including dev dependencies)
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Generate Prisma Client
+RUN npx prisma generate
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/uploads /app/platform-source
+
+# Expose ports
+EXPOSE 6000 2222 6001
+
+# Development command with hot-reload
+CMD ["npm", "run", "dev"]

@@ -1,0 +1,17 @@
+{
+  "name": "baron-car-rental",
+  "version": "1.0.0",
+  "description": "Full-stack Arabic car-rental management system",
+  "private": true,
+  "scripts": {
+    "setup": "powershell -ExecutionPolicy Bypass -File ./setup.ps1",
+    "dev:backend": "cd server && npm run dev",
+    "dev:frontend": "cd client && npm run dev",
+    "build:backend": "cd server && npm run build",
+    "build:frontend": "cd client && npm run build",
+    "test:backend": "cd server && npm test"
+  },
+  "keywords": ["car-rental", "management", "arabic", "react", "nodejs"],
+  "author": "Baron Car Rental",
+  "license": "MIT"
+}

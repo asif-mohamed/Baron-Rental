@@ -1,0 +1,329 @@
+// This is your Prisma schema file for the PLATFORM (Control Plane)
+// Manages tenants, configurations, and platform metadata
+// Tenant-specific data lives in separate databases managed by this platform
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/platform"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// TENANT MANAGEMENT
+// ============================================================================
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String   // e.g., "Baron Riyadh", "Premium Rentals"
+  slug      String   @unique // e.g., "baron-riyadh", "premium-rentals"
+  domain    String?  @unique // e.g., "baron-riyadh.example.com"
+  status    TenantStatus @default(ACTIVE)
+  
+  // Database configuration
+  databaseType     String  @default("postgresql") // postgresql, sqlite, mysql
+  databaseUrl      String  // Connection string to tenant's database
+  databaseHost     String?
+  databasePort     Int?
+  databaseName     String?
+  databaseUser     String?
+  databasePassword String? // Encrypted in production
+  
+  // Service endpoints
+  backendUrl   String? // e.g., "http://localhost:5000"
+  frontendUrl  String? // e.g., "http://localhost:5173"
+  apiBasePath  String  @default("/api")
+  
+  // Resource limits
+  maxUsers       Int     @default(50)
+  maxCars        Int     @default(100)
+  maxBookings    Int     @default(1000)
+  storageQuotaMB Int     @default(1024)
+  
+  // Billing
+  plan           String  @default("free") // free, starter, professional, enterprise
+  billingStatus  String  @default("active")
+  
+  // Timestamps
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  lastAccessedAt DateTime?
+  
+  // Relations
+  configuration TenantConfiguration?
+  users         TenantUser[]
+  apiKeys       ApiKey[]
+  auditLogs     AuditLog[]
+  
+  @@index([slug])
+  @@index([status])
+  @@map("tenants")
+}
+
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+  DELETED
+}
+
+// ============================================================================
+// TENANT CONFIGURATION (Business Flavor Settings)
+// ============================================================================
+
+model TenantConfiguration {
+  id       String @id @default(uuid())
+  tenantId String @unique
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Business Display
+  displayName       String  // "Baron Car Rental"
+  displayNameArabic String  // "سلسلة البارون"
+  logoUrl           String?
+  faviconUrl        String?
+  
+  // Localization
+  timezone String @default("Asia/Riyadh")
+  currency String @default("SAR")
+  language String @default("ar") // ar, en, ar-en (bilingual)
+  
+  // Theme
+  primaryColor   String @default("#1e3a8a")
+  secondaryColor String @default("#d97706")
+  themeMode      String @default("light") // light, dark, auto
+  
+  // Features (JSON array of enabled feature flags)
+  enabledFeatures Json @default("[]")
+  disabledTabs    Json @default("[]")
+  enabledRoles    Json @default("[\"Admin\",\"Manager\",\"Reception\",\"Warehouse\",\"Accountant\",\"Mechanic\"]")
+  
+  // Custom settings (flexible JSON for future extensions)
+  customSettings Json @default("{}")
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("tenant_configurations")
+}
+
+// ============================================================================
+// PLATFORM USERS (Platform administrators, not tenant users)
+// ============================================================================
+
+model PlatformUser {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  role         PlatformRole @default(VIEWER)
+  isActive     Boolean  @default(true)
+  
+  // Permissions
+  canCreateTenants   Boolean @default(false)
+  canDeleteTenants   Boolean @default(false)
+  canModifyConfig    Boolean @default(false)
+  canAccessSSH       Boolean @default(false)
+  canViewAuditLogs   Boolean @default(true)
+  
+  // Timestamps
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  lastLoginAt  DateTime?
+  
+  // Relations
+  auditLogs    AuditLog[]
+  
+  @@map("platform_users")
+}
+
+enum PlatformRole {
+  SUPER_ADMIN  // Full platform control
+  ADMIN        // Tenant management
+  OPERATOR     // Service operations
+  VIEWER       // Read-only access
+}
+
+// ============================================================================
+// TENANT USERS (References to users in tenant databases)
+// ============================================================================
+
+model TenantUser {
+  id          String   @id @default(uuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // User reference (from tenant's database)
+  userId      String   // UUID from tenant's user table
+  email       String
+  fullName    String
+  roleName    String   // Admin, Manager, Reception, etc.
+  
+  // Status
+  isActive    Boolean  @default(true)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastLoginAt DateTime?
+  
+  @@unique([tenantId, userId])
+  @@index([tenantId])
+  @@map("tenant_users")
+}
+
+// ============================================================================
+// API KEYS (For programmatic access to platform)
+// ============================================================================
+
+model ApiKey {
+  id          String   @id @default(uuid())
+  tenantId    String?
+  tenant      Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  key         String   @unique // Encrypted API key
+  name        String   // Descriptive name
+  permissions Json     @default("[]") // Array of permission strings
+  
+  isActive    Boolean  @default(true)
+  expiresAt   DateTime?
+  
+  // Usage tracking
+  lastUsedAt  DateTime?
+  usageCount  Int      @default(0)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@map("api_keys")
+}
+
+// ============================================================================
+// AUDIT LOGS (Platform-level activity tracking)
+// ============================================================================
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  
+  // Actor
+  userId     String?  // PlatformUser ID
+  user       PlatformUser? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  actorType  String   // platform_user, tenant_user, system
+  actorId    String?  // Generic actor identifier
+  
+  // Tenant context
+  tenantId   String?
+  tenant     Tenant?  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  // Action details
+  action     String   // create_tenant, update_config, delete_user, etc.
+  resource   String   // tenant, configuration, user, etc.
+  resourceId String?  // ID of affected resource
+  
+  // Request metadata
+  ipAddress  String?
+  userAgent  String?
+  method     String?  // GET, POST, PUT, DELETE
+  endpoint   String?  // API endpoint
+  
+  // Data
+  oldValue   Json?    // Before state
+  newValue   Json?    // After state
+  metadata   Json?    // Additional context
+  
+  // Result
+  status     String   // success, failure, error
+  errorMessage String?
+  
+  // Timestamp
+  createdAt  DateTime @default(now())
+  
+  @@index([tenantId])
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ============================================================================
+// SERVICE REGISTRY (Track running tenant services)
+// ============================================================================
+
+model ServiceInstance {
+  id          String   @id @default(uuid())
+  tenantId    String
+  
+  // Service details
+  type        ServiceType
+  status      ServiceStatus @default(STARTING)
+  
+  // Endpoint information
+  host        String
+  port        Int
+  protocol    String   @default("http") // http, https, ws, wss
+  healthUrl   String?  // Health check endpoint
+  
+  // Resource usage
+  cpuUsage    Float?
+  memoryUsage Int?     // MB
+  diskUsage   Int?     // MB
+  
+  // Metadata
+  version     String?
+  startedAt   DateTime @default(now())
+  lastHealthCheck DateTime?
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([tenantId])
+  @@index([status])
+  @@map("service_instances")
+}
+
+enum ServiceType {
+  BACKEND
+  FRONTEND
+  DATABASE
+  WORKER
+}
+
+enum ServiceStatus {
+  STARTING
+  RUNNING
+  STOPPING
+  STOPPED
+  ERROR
+}
+
+// ============================================================================
+// CONFIGURATION TEMPLATES (Preset tenant configurations)
+// ============================================================================
+
+model ConfigTemplate {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  
+  // Template category
+  category    String   // enterprise, branch, kiosk, white-label
+  
+  // Configuration data (JSON)
+  config      Json
+  
+  // Usage tracking
+  usageCount  Int      @default(0)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("config_templates")
+}
