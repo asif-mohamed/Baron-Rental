@@ -153,17 +153,19 @@ const Customers = () => {
     }
 
     try {
-      // In development, use proxy (relative URL). In production, use API base URL
-      const isDevelopment = import.meta.env.DEV;
-      const apiBaseUrl = isDevelopment ? '' : getApiBaseUrl();
-      
       for (const doc of availableDocs) {
         // Get file extension from URL
         const ext = doc.url!.split('.').pop() || 'pdf';
         const fileName = `${doc.name}.${ext}`;
         
-        // Download file - uses vite proxy in dev, direct API URL in production
-        const response = await fetch(`${apiBaseUrl}${doc.url}`, {
+        // In development, proxy handles /uploads. In production, use full API URL
+        const isDevelopment = import.meta.env.DEV;
+        const fileUrl = isDevelopment 
+          ? doc.url! // Vite proxy will handle /uploads/...
+          : `${getApiBaseUrl()}${doc.url}`; // Production: full URL
+        
+        // Download file
+        const response = await fetch(fileUrl, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`

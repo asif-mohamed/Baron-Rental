@@ -18,6 +18,7 @@ router.get('/search', searchCustomers);
 router.get('/:id', getCustomerById);
 router.post('/', checkPermission('customers', 'create'), createCustomer);
 router.put('/:id', checkPermission('customers', 'update'), updateCustomer);
+router.patch('/:id', checkPermission('customers', 'update'), updateCustomer);
 router.delete('/:id', checkPermission('customers', 'delete'), deleteCustomer);
 
 export default router;

@@ -48,7 +48,7 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
+    fileSize: 10 * 1024 * 1024 // 10MB limit
   }
 });
 
@@ -56,28 +56,46 @@ const upload = multer({
  * POST /api/upload/single
  * Upload a single file
  */
-router.post('/single', upload.single('file'), (req: Request, res: Response) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
+router.post('/single', (req: Request, res: Response) => {
+  upload.single('file')(req, res, (err) => {
+    if (err) {
+      console.error('Multer upload error:', err);
+      return res.status(500).json({ 
+        status: 'error',
+        message: err.message || 'Failed to upload file',
+        error: err.message
+      });
     }
 
-    const filePath = `/uploads/${req.body.entityType || 'general'}/${req.file.filename}`;
-    
-    res.json({
-      message: 'File uploaded successfully',
-      file: {
-        filename: req.file.filename,
-        originalName: req.file.originalname,
-        mimetype: req.file.mimetype,
-        size: req.file.size,
-        path: filePath
+    try {
+      if (!req.file) {
+        return res.status(400).json({ 
+          status: 'error',
+          message: 'No file uploaded' 
+        });
       }
-    });
-  } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).json({ error: 'Failed to upload file' });
-  }
+
+      const filePath = `/uploads/${req.body.entityType || 'general'}/${req.file.filename}`;
+      
+      res.json({
+        message: 'File uploaded successfully',
+        file: {
+          filename: req.file.filename,
+          originalName: req.file.originalname,
+          mimetype: req.file.mimetype,
+          size: req.file.size,
+          path: filePath
+        }
+      });
+    } catch (error: any) {
+      console.error('Upload processing error:', error);
+      res.status(500).json({ 
+        status: 'error',
+        message: 'Failed to process uploaded file',
+        error: error.message
+      });
+    }
+  });
 });
 
 /**

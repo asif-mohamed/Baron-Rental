@@ -95,25 +95,37 @@ export const getCustomerById = async (req: AuthRequest, res: Response, next: Nex
 
 export const createCustomer = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
+    // Clean the data by removing undefined values
+    const cleanData = Object.fromEntries(
+      Object.entries(req.body).filter(([_, value]) => value !== undefined)
+    );
+
     const customer = await prisma.customer.create({
-      data: req.body,
+      data: cleanData as any,
     });
 
     res.status(201).json({ customer });
   } catch (error) {
+    console.error('Error creating customer:', error);
     next(error);
   }
 };
 
 export const updateCustomer = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
+    // Clean the data by removing undefined values
+    const cleanData = Object.fromEntries(
+      Object.entries(req.body).filter(([_, value]) => value !== undefined)
+    );
+
     const customer = await prisma.customer.update({
       where: { id: req.params.id },
-      data: req.body,
+      data: cleanData as any,
     });
 
     res.json({ customer });
   } catch (error) {
+    console.error('Error updating customer:', error);
     next(error);
   }
 };
