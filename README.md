@@ -493,7 +493,7 @@ This is a proprietary project. Contributions are managed internally.
 
 **Proprietary License**
 
-- **Platform Owner:** Nexus
+- **Platform Owner:** Asif Mohamed <a.mohamed121991@outlook.com>
 - **Business Instance:** Baron Car Rental Management System
 - **Platform:** Nexus Platform (Multi-tenant SaaS Infrastructure)
 

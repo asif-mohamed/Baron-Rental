@@ -174,5 +174,6 @@ code INDEX.md  # Or use your preferred editor
 ---
 
 **Platform:** Nexus Platform  
+**Owner:** Asif Mohamed <a.mohamed121991@outlook.com>  
 **Business:** Baron Car Rental Management System  
 **Status:** Production Ready ✅

@@ -1,6 +1,7 @@
 # ============================================================================
 # NEXUS PLATFORM - MASTER SETUP SCRIPT
-# Platform Owner: Nexus | Business License: Baron Car Rental
+# Platform Owner: Asif Mohamed <a.mohamed121991@outlook.com>
+# Business License: Baron Car Rental
 # ============================================================================
 # Comprehensive setup orchestration:
 # 1. Initialization and path validation
@@ -83,7 +84,7 @@ function Write-SubHeader {
 
 function Initialize-Setup {
     Write-Header "NEXUS PLATFORM - MASTER SETUP INITIALIZATION"
-    Write-Host "Platform Owner: Nexus | Business License: Baron Car Rental`n" -ForegroundColor Gray
+    Write-Host "Platform Owner: Asif Mohamed <a.mohamed121991@outlook.com>`n" -ForegroundColor Gray
     
     # Initialize log file
     if (Test-Path $Global:SetupLog) {
@@ -376,16 +377,21 @@ function Initialize-EnvironmentFiles {
             # Validate the file is not empty
             $content = Get-Content $envConfig.TargetPath -Raw -ErrorAction SilentlyContinue
             if ([string]::IsNullOrWhiteSpace($content)) {
-                Write-Log ".env file exists but is empty - recreating from template" "WARNING"
+                Write-Log ".env file exists but is empty - will try to populate" "WARNING"
                 
+                # Only copy from .env.example if it exists
                 if (Test-Path $envConfig.TemplatePath) {
+                    Write-Log "Template .env.example found - copying content" "INFO"
                     Copy-Item -Path $envConfig.TemplatePath -Destination $envConfig.TargetPath -Force
-                    Write-Log "Recreated .env from template" "SUCCESS"
+                    Write-Log "Populated .env from .env.example template" "SUCCESS"
                     $envCreated++
-                    $Global:PatchesApplied += "Recreated $($envConfig.Name)"
+                    $Global:PatchesApplied += "Recreated $($envConfig.Name) from template"
+                } else {
+                    Write-Log "No .env.example template found - .env remains empty" "WARNING"
+                    Write-Log "Developer may have custom .env configuration" "INFO"
                 }
             } else {
-                Write-Log ".env file validated (not empty)" "SUCCESS"
+                Write-Log ".env file validated (not empty) - using existing configuration" "SUCCESS"
                 $envValidated++
             }
             
@@ -394,15 +400,15 @@ function Initialize-EnvironmentFiles {
             Write-Log ".env file missing: $($envConfig.TargetPath)" "WARNING"
             
             if ($envConfig.CreateIfMissing) {
-                # Check if template exists
+                # Check if .env.example template exists first
                 if (Test-Path $envConfig.TemplatePath) {
-                    Write-Log "Creating .env from template: $($envConfig.TemplatePath)" "INFO"
+                    Write-Log "Template .env.example found - creating .env from it" "INFO"
                     
                     try {
                         Copy-Item -Path $envConfig.TemplatePath -Destination $envConfig.TargetPath -Force
-                        Write-Log "Created .env successfully" "SUCCESS"
+                        Write-Log "Created .env from .env.example successfully" "SUCCESS"
                         $envCreated++
-                        $Global:PatchesApplied += "Created $($envConfig.Name)"
+                        $Global:PatchesApplied += "Created $($envConfig.Name) from template"
                         
                         # Verify the copy was successful
                         if (Test-Path $envConfig.TargetPath) {
@@ -428,21 +434,23 @@ function Initialize-EnvironmentFiles {
                     }
                     
                 } else {
-                    # Template doesn't exist
-                    Write-Log "Template file missing: $($envConfig.TemplatePath)" "ERROR"
+                    # .env.example template doesn't exist
+                    Write-Log "No .env.example template found: $($envConfig.TemplatePath)" "WARNING"
+                    Write-Log "Developer may have removed .example extension for custom config" "INFO"
                     
                     if ($envConfig.Required) {
-                        Write-Log "This is a REQUIRED environment file!" "ERROR"
-                        $Global:ErrorsFound += "Missing template for $($envConfig.Name)"
-                        $envSuccess = $false
+                        Write-Log "This is a REQUIRED environment file!" "WARNING"
+                        Write-Log "Creating minimal .env as fallback..." "INFO"
+                        $Global:ErrorsFound += "Missing .env.example template for $($envConfig.Name)"
                     }
                     
-                    # Try to create a minimal .env file
+                    # Try to create a minimal .env file as last resort
                     if ($envConfig.Name -eq "Platform Environment") {
                         Write-Log "Creating minimal platform .env file..." "WARNING"
                         $minimalEnv = @"
 # NEXUS PLATFORM - Environment Configuration
 # Created automatically by master-setup.ps1
+# Platform Owner: Asif Mohamed <a.mohamed121991@outlook.com>
 
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/baron_platform"
 PLATFORM_PORT=6000
@@ -467,6 +475,7 @@ LOG_LEVEL=info
                         $minimalEnv = @"
 # BARON SERVER - Environment Configuration
 # Created automatically by master-setup.ps1
+# Platform Owner: Asif Mohamed <a.mohamed121991@outlook.com>
 
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/baron_db"
 PORT=5000

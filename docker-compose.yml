@@ -1,6 +1,7 @@
 # ============================================================================
 # NEXUS PLATFORM - Docker Compose Configuration
-# Platform Owner: Nexus | Business License: Baron Car Rental
+# Platform Owner: Asif Mohamed <a.mohamed121991@outlook.com>
+# Business License: Baron Car Rental
 # ============================================================================
 # Orchestrates: Platform, Baron Backend, Baron Frontend, PostgreSQL, Redis
 

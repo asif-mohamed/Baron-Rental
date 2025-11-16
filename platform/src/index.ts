@@ -44,9 +44,9 @@ import { HealthMonitorService } from './services/health-monitor';
 import { logger } from './services/logger';
 
 // ============================================================================
-// BARON PLATFORM - Multi-Tenant SaaS Control Plane
+// NEXUS PLATFORM - Multi-Tenant SaaS Control Plane
 // ============================================================================
-// Platform Owner: Asif (Original Developer)
+// Platform Owner: Asif Mohamed <a.mohamed121991@outlook.com>
 // Business License: Baron Car Rental Management System
 // 
 // This is the NEXUS platform layer that manages all Baron tenant instances
@@ -103,7 +103,8 @@ app.get('/health', (req, res) => {
 app.get('/info', (req, res) => {
   res.json({
     name: 'Nexus Platform - Control Plane',
-    platformOwner: 'Nexus',
+    platformOwner: 'Asif Mohamed',
+    platformEmail: 'a.mohamed121991@outlook.com',
     businessLicense: 'Baron Car Rental Management System',
     version: '1.0.0',
     description: 'Multi-tenant SaaS management platform. Licensed for Baron Car Rental operations. Platform source code accessible via SSH for forking and local development.',

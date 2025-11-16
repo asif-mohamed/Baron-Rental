@@ -1,6 +1,7 @@
 # ============================================================================
 # NEXUS PLATFORM - Docker Setup Script
-# Platform Owner: Nexus | Business License: Baron Car Rental
+# Platform Owner: Asif Mohamed <a.mohamed121991@outlook.com>
+# Business License: Baron Car Rental
 # ============================================================================
 # This script sets up and runs the complete Baron platform using Docker Compose
 # 
@@ -67,7 +68,7 @@ function Write-Step {
 # Check prerequisites
 function Test-Prerequisites {
     Write-Header "NEXUS PLATFORM - Docker Setup"
-    Write-Host "Platform Owner: Nexus | Business License: Baron Car Rental`n" -ForegroundColor Gray
+    Write-Host "Platform Owner: Asif Mohamed <a.mohamed121991@outlook.com>`n" -ForegroundColor Gray
     
     Write-Step "Checking prerequisites..."
     
