@@ -488,7 +488,7 @@ async function main() {
 
   console.log('✅ Demo cars created');
 
-  // Create Demo Customers
+  // Create Demo Customers with Document References
   const customers = await Promise.all([
     prisma.customer.create({
       data: {
@@ -500,6 +500,9 @@ async function main() {
         licenseExpiry: new Date('2026-12-31'),
         nationalId: '1234567890',
         dateOfBirth: new Date('1990-05-15'),
+        nationalIdDocument: '/uploads/customers/sample-id-1.pdf',
+        fingerprintDocument: '/uploads/customers/sample-fingerprint-1.pdf',
+        rentalContract: '/uploads/customers/sample-contract-1.pdf',
       },
     }),
     prisma.customer.create({
@@ -512,6 +515,8 @@ async function main() {
         licenseExpiry: new Date('2025-08-20'),
         nationalId: '9876543210',
         dateOfBirth: new Date('1988-11-22'),
+        nationalIdDocument: '/uploads/customers/sample-id-2.pdf',
+        fingerprintDocument: '/uploads/customers/sample-fingerprint-2.pdf',
       },
     }),
     prisma.customer.create({
@@ -524,6 +529,7 @@ async function main() {
         licenseExpiry: new Date('2027-03-10'),
         nationalId: '5556667778',
         dateOfBirth: new Date('1985-03-08'),
+        rentalContract: '/uploads/customers/sample-contract-3.pdf',
       },
     }),
   ]);

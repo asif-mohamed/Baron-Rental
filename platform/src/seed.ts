@@ -23,7 +23,73 @@ async function seed() {
   
   console.log(`Created platform admin: ${admin.username} (${admin.email})`);
   
-  // Create demo tenant (optional)
+  // Create Baron Car Rental tenant with proper configuration
+  const baronTenant = await prisma.tenant.upsert({
+    where: { slug: 'baron' },
+    update: {},
+    create: {
+      name: 'سلسلة البارون لتأجير السيارات',
+      slug: 'baron',
+      domain: 'baron.local',
+      databaseUrl: process.env.BARON_DATABASE_URL || process.env.DATABASE_URL || '',
+      plan: 'ENTERPRISE',
+      status: 'ACTIVE',
+      resourceLimits: {
+        maxUsers: 100,
+        maxCars: 500,
+        maxBookings: 10000,
+        storageGB: 100,
+      },
+      configuration: {
+        create: {
+          displayName: 'سلسلة البارون لتأجير السيارات',
+          theme: {
+            primaryColor: '#2563eb',
+            secondaryColor: '#1e40af',
+            accentColor: '#3b82f6',
+          },
+          timezone: 'Asia/Riyadh',
+          currency: 'SAR',
+          language: 'ar',
+          enabledFeatures: [
+            'fleet-management',
+            'booking-system',
+            'customer-management',
+            'financial-tracking',
+            'maintenance-scheduler',
+            'employee-performance',
+            'business-planning',
+            'document-uploads',
+            'real-time-notifications',
+          ],
+          enabledRoles: [
+            'ADMIN',
+            'MANAGER',
+            'RECEPTION',
+            'ACCOUNTANT',
+            'MECHANIC',
+            'DRIVER',
+            'WAREHOUSE',
+          ],
+          customSettings: {
+            businessName: 'سلسلة البارون لتأجير السيارات',
+            businessOwner: 'Asif Mohamed',
+            ownerEmail: 'a.mohamed121991@outlook.com',
+            address: 'المملكة العربية السعودية',
+            vatEnabled: true,
+            vatRate: 0.15,
+            defaultRentalTerms: 'شروط وأحكام تأجير السيارات',
+            maintenanceInterval: 5000,
+            insuranceRequired: true,
+          },
+        },
+      },
+    },
+  });
+  
+  console.log(`Created Baron tenant: ${baronTenant.name}`);
+  
+  // Create demo tenant (optional - for testing)
   const demoTenant = await prisma.tenant.upsert({
     where: { slug: 'demo' },
     update: {},
@@ -34,7 +100,12 @@ async function seed() {
       databaseUrl: process.env.DEMO_TENANT_DATABASE_URL || '',
       plan: 'FREE',
       status: 'ACTIVE',
-      resourceLimits: {},
+      resourceLimits: {
+        maxUsers: 10,
+        maxCars: 20,
+        maxBookings: 100,
+        storageGB: 5,
+      },
       configuration: {
         create: {
           displayName: 'Demo Baron Instance',
@@ -42,7 +113,7 @@ async function seed() {
           timezone: 'UTC',
           currency: 'USD',
           language: 'en',
-          enabledFeatures: [],
+          enabledFeatures: ['fleet-management', 'booking-system'],
           enabledRoles: ['ACCOUNTANT', 'MANAGER', 'MECHANIC', 'DRIVER'],
           customSettings: {},
         },
