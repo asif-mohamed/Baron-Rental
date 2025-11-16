@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Plus, Search, Edit2, Trash2, Eye, FileText } from 'lucide-react';
+import { Users, Plus, Search, Edit2, Trash2, Eye, FileText, Download } from 'lucide-react';
 import api from '../lib/api';
 import { toast } from 'react-toastify';
 
@@ -135,6 +135,57 @@ const Customers = () => {
       fetchCustomers();
     } catch (error: any) {
       toast.error('فشل حذف العميل');
+    }
+  };
+
+  const handleDownloadDocuments = async (customer: Customer) => {
+    const documents = [
+      { url: customer.nationalIdDocument, name: `${customer.fullName}_الهوية_الوطنية` },
+      { url: customer.fingerprintDocument, name: `${customer.fullName}_البصمة` },
+      { url: customer.rentalContract, name: `${customer.fullName}_عقد_الإيجار` }
+    ];
+
+    const availableDocs = documents.filter(doc => doc.url);
+
+    if (availableDocs.length === 0) {
+      toast.info('لا توجد مستندات مرفقة لهذا العميل');
+      return;
+    }
+
+    try {
+      for (const doc of availableDocs) {
+        // Get file extension from URL
+        const ext = doc.url!.split('.').pop() || 'pdf';
+        const fileName = `${doc.name}.${ext}`;
+        
+        // Download file
+        const response = await fetch(`http://localhost:5000${doc.url}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (!response.ok) throw new Error('فشل تحميل الملف');
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        // Small delay between downloads to prevent browser blocking
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
+      toast.success(`تم تحميل ${availableDocs.length} مستند بنجاح`);
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('فشل تحميل المستندات');
     }
   };
 
@@ -286,6 +337,14 @@ const Customers = () => {
                         title="تعديل"
                       >
                         <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDownloadDocuments(customer)}
+                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                        title="تحميل المستندات"
+                        disabled={!customer.nationalIdDocument && !customer.fingerprintDocument && !customer.rentalContract}
+                      >
+                        <Download className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(customer.id)}
