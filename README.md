@@ -227,15 +227,30 @@ After successful setup:
 
 ## 👤 Default Credentials
 
+### Platform Admin (SSH & Platform API Access)
+
+| Service | Username | Password |
+|---------|----------|----------|
+| **SSH Server** | `admin` | `Admin123!@#Platform` |
+| **Platform API** | `admin` | `Admin123!@#Platform` |
+
+SSH Access:
+```bash
+ssh admin@localhost -p 2222
+# Password: Admin123!@#Platform
+```
+
+### Baron Application Users
+
 Default accounts created during seeding:
 
 | Role | Email | Password |
 |------|-------|----------|
-| **Admin** | admin@baron.com | Admin123!@# |
-| **Manager** | manager@baron.com | Manager123!@# |
-| **Accountant** | accountant@baron.com | Accountant123!@# |
-| **Mechanic** | mechanic@baron.com | Mechanic123!@# |
-| **Receptionist** | receptionist@baron.com | Receptionist123!@# |
+| **Admin** | admin@baron.local | Admin123! |
+| **Manager** | manager@baron.local | Admin123! |
+| **Accountant** | accountant@baron.local | Admin123! |
+| **Mechanic** | mechanic@baron.local | Admin123! |
+| **Receptionist** | receptionist@baron.local | Admin123! |
 
 **⚠️ IMPORTANT:** Change these passwords immediately in production!
 
