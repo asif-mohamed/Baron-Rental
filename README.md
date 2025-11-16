@@ -106,8 +106,8 @@ Baron is a comprehensive car rental management system built on a **multi-tenant 
 
 ```bash
 # Clone the repository
-git clone https://github.com/asif-mohamed/baron_on_Asif-platform.git
-cd baron_on_Asif-platform
+git clone https://github.com/asif-mohamed/baron_on_Nexus-Platform.git
+cd baron_on_Nexus-Platform
 
 # Run master setup script (Windows)
 .\master-setup.ps1
@@ -541,9 +541,10 @@ For issues or questions:
 
 ## 📞 Contact
 
-**Platform Owner:** Asif  
+**Platform Owner:** Asif Mohamed  
+**Email:** a.mohamed121991@outlook.com  
 **GitHub:** [@asif-mohamed](https://github.com/asif-mohamed)  
-**Repository:** [baron_on_Asif-platform](https://github.com/asif-mohamed/baron_on_Asif-platform)
+**Repository:** [baron_on_Nexus-Platform](https://github.com/asif-mohamed/baron_on_Nexus-Platform)
 
 ---
 
