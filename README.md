@@ -6,6 +6,9 @@
 
 **A comprehensive car rental management system built with React, TypeScript, Node.js, Express, and Prisma**
 
+> **📥 First time setup?** See [QUICK_START.md](QUICK_START.md) for complete installation guide  
+> **🚀 Need dependencies?** Run `.\install-dependencies.ps1` to install all required packages
+
 ---
 
 ## � Quick Start Guide
