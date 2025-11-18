@@ -198,35 +198,45 @@ Baron is a comprehensive car rental management system designed specifically for 
 
 ### Prerequisites
 - Node.js 18+ and npm
-- Git
+- Git (for cloning) or download ZIP
 
-### Quick Setup
+### Quick Setup (Automated)
 
-1. **Clone the repository:**
+If you downloaded the project as a ZIP file or cloned from GitHub, use the automated setup:
+
+1. **Download/Clone the repository:**
 ```bash
+# Option 1: Clone with Git
 git clone https://github.com/asif-mohamed/Baron-Rental.git
 cd Baron-Rental
+
+# Option 2: Download ZIP from GitHub
+# Extract the ZIP file and navigate to the folder
+cd Baron-Rental-main
 ```
 
-2. **Backend Setup:**
+2. **Install all dependencies automatically:**
+```powershell
+# This installs dependencies for both backend and frontend
+.\install-dependencies.ps1
+```
+
+The script will:
+- ✅ Check Node.js and npm versions
+- ✅ Install backend (server) dependencies
+- ✅ Install frontend (client) dependencies
+- ✅ Generate Prisma Client
+- ✅ Display installation summary
+
+3. **Setup database and seed demo data:**
 ```powershell
 cd server
-npm install
-
-# Generate Prisma client
-npx prisma generate
 
 # Run migrations
 npx prisma migrate deploy
 
-# Seed demo data
+# Seed demo data (6 users + fleet + bookings + transactions)
 npm run seed
-```
-
-3. **Frontend Setup:**
-```powershell
-cd ../client
-npm install
 ```
 
 4. **Start Development:**
@@ -244,6 +254,25 @@ cd client
 npm run dev
 ```
 Frontend runs on http://localhost:5173
+
+### Manual Setup (Alternative)
+
+If you prefer manual installation:
+
+**Backend Setup:**
+```powershell
+cd server
+npm install
+npx prisma generate
+npx prisma migrate deploy
+npm run seed
+```
+
+**Frontend Setup:**
+```powershell
+cd client
+npm install
+```
 
 ---
 
