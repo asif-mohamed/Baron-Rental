@@ -113,15 +113,21 @@ function Install-BackendDependencies {
         
         Write-Info "Installing packages (this may take 2-3 minutes)..."
         
-        # Run npm install and capture exit code (ignore stderr warnings)
-        $null = npm install 2>&1
+        # Temporarily allow errors from npm (warnings go to stderr)
+        $prevErrorAction = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
         
-        if ($LASTEXITCODE -eq 0) {
+        npm install 2>&1 | Out-Null
+        $installResult = $LASTEXITCODE
+        
+        $ErrorActionPreference = $prevErrorAction
+        
+        if ($installResult -eq 0) {
             $packageCount = (Get-Content package.json | ConvertFrom-Json).dependencies.PSObject.Properties.Count
             Write-Success "Installed $packageCount backend packages"
         } else {
             Write-Error-Custom "Failed to install backend dependencies"
-            Write-Host "  npm install exited with code: $LASTEXITCODE" -ForegroundColor Red
+            Write-Host "  npm install exited with code: $installResult" -ForegroundColor Red
             throw "Backend dependency installation failed"
         }
     } finally {
@@ -148,15 +154,21 @@ function Install-FrontendDependencies {
         
         Write-Info "Installing packages (this may take 2-3 minutes)..."
         
-        # Run npm install and capture exit code (ignore stderr warnings)
-        $null = npm install 2>&1
+        # Temporarily allow errors from npm (warnings go to stderr)
+        $prevErrorAction = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
         
-        if ($LASTEXITCODE -eq 0) {
+        npm install 2>&1 | Out-Null
+        $installResult = $LASTEXITCODE
+        
+        $ErrorActionPreference = $prevErrorAction
+        
+        if ($installResult -eq 0) {
             $packageCount = (Get-Content package.json | ConvertFrom-Json).dependencies.PSObject.Properties.Count
             Write-Success "Installed $packageCount frontend packages"
         } else {
             Write-Error-Custom "Failed to install frontend dependencies"
-            Write-Host "  npm install exited with code: $LASTEXITCODE" -ForegroundColor Red
+            Write-Host "  npm install exited with code: $installResult" -ForegroundColor Red
             throw "Frontend dependency installation failed"
         }
     } finally {
@@ -172,9 +184,16 @@ function Setup-Prisma {
     
     try {
         Write-Info "Generating Prisma Client..."
-        $null = npx prisma generate 2>&1
         
-        if ($LASTEXITCODE -eq 0) {
+        $prevErrorAction = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        
+        npx prisma generate 2>&1 | Out-Null
+        $generateResult = $LASTEXITCODE
+        
+        $ErrorActionPreference = $prevErrorAction
+        
+        if ($generateResult -eq 0) {
             Write-Success "Prisma Client generated"
         } else {
             Write-Warning "Prisma generation had warnings (continuing...)"
@@ -192,18 +211,32 @@ function Setup-Database {
     
     try {
         Write-Info "Running database migrations..."
-        $null = npx prisma migrate deploy 2>&1
         
-        if ($LASTEXITCODE -eq 0) {
+        $prevErrorAction = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        
+        npx prisma migrate deploy 2>&1 | Out-Null
+        $migrateResult = $LASTEXITCODE
+        
+        $ErrorActionPreference = $prevErrorAction
+        
+        if ($migrateResult -eq 0) {
             Write-Success "Database migrations applied"
         } else {
             Write-Warning "Migration warnings (continuing...)"
         }
         
         Write-Info "Seeding database with demo data..."
-        $null = npm run seed 2>&1
         
-        if ($LASTEXITCODE -eq 0) {
+        $prevErrorAction = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        
+        npm run seed 2>&1 | Out-Null
+        $seedResult = $LASTEXITCODE
+        
+        $ErrorActionPreference = $prevErrorAction
+        
+        if ($seedResult -eq 0) {
             Write-Success "Database seeded with demo data"
             Write-Info "Created 6 user accounts"
         } else {
