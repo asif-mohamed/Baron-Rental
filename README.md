@@ -1,210 +1,249 @@
-# Baron Car Rental Management System
+# 🚗 سلسلة البارون - Baron Car Rental Management System
 
-[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
-[![Platform: Nexus](https://img.shields.io/badge/Platform-Nexus-blue.svg)](https://github.com/asif-mohamed)
-[![Status: Production Ready](https://img.shields.io/badge/Status-Production%20Ready-green.svg)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Status: Beta Testing](https://img.shields.io/badge/Status-Beta%20Testing-orange.svg)]()
+[![Completion: 98%](https://img.shields.io/badge/Completion-98%25-brightgreen.svg)]()
 
-**A complete multi-tenant SaaS car rental management system running on the Nexus Platform**
+**A comprehensive car rental management system built with React, TypeScript, Node.js, Express, and Prisma**
+
+---
+
+## � Quick Start Guide
+
+### ⚡ Automated Setup (Recommended)
+
+**Step 1:** Run Database Setup (only once):
+```powershell
+.\setup-database.ps1
+```
+This will:
+- Generate Prisma Client
+- Create database tables  
+- Seed demo data
+
+**Step 2:** Start the Application:
+```powershell
+.\start-all.ps1
+```
+This will start both backend and frontend servers automatically.
+
+### 🔧 Alternative: Start Servers Individually
+
+- **Backend Only**: `.\start-backend.ps1`
+- **Frontend Only**: `.\start-frontend.ps1`
+
+---
+
+## 🌐 Access the Application
+
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:5000
 
 ---
 
 ## 🚗 Overview
 
-Baron is a comprehensive car rental management system built on a **multi-tenant SaaS architecture**. It leverages the **Nexus Platform** for service orchestration, discovery, and routing, providing enterprise-grade fleet management, booking systems, and business operations.
+Baron is a comprehensive car rental management system designed specifically for **سلسلة البارون** (Baron Car Rental Company) in Libya. The system provides enterprise-grade fleet management, booking systems, financial tracking, and complete business operations management.
 
 ### Key Features
 
-- 🚙 **Fleet Management** - Complete vehicle inventory, tracking, and lifecycle management
-- 📅 **Booking System** - Online reservations with real-time availability
-- 💰 **Financial Management** - Revenue tracking, invoicing, and payment processing
-- 👥 **Customer Management** - Customer profiles, history, and loyalty programs
-- 🔧 **Maintenance Tracking** - Service schedules, repair history, and preventive maintenance
-- 📊 **Business Intelligence** - Comprehensive reporting and analytics dashboards
-- 👨‍💼 **Multi-Role Access** - Admin, Manager, Accountant, Mechanic, Receptionist roles
-- 🔐 **Secure Authentication** - JWT-based authentication with role-based access control
+- 🚙 **Fleet Management** - Vehicle inventory, tracking, odometer monitoring, and lifecycle management
+- 📅 **Booking System** - Real-time availability, automatic pricing, odometer tracking
+- 💰 **Financial Management** - Revenue tracking, extra km charges, pending transactions
+- 👥 **Customer Management** - Profiles, documents (ID, fingerprint, contracts), search
+- 🔧 **Maintenance Tracking** - Service schedules, repair history, automatic triggers
+- 📊 **Business Intelligence** - Real-time dashboards, revenue/expense reports, analytics
+- 🔔 **Notification System** - Role-based notifications, accountant alerts, real-time updates
+- 👨‍💼 **Multi-Role Access** - Admin, Manager, Accountant, Mechanic, Reception, Warehouse
+- 🔐 **Secure Authentication** - JWT-based authentication with RBAC
+- 🌍 **Libya Localization** - LYD currency, Tripoli timezone, Gregorian calendar, Arabic RTL
 - 📱 **Responsive Design** - Works seamlessly on desktop, tablet, and mobile
-- 🐳 **Docker Ready** - Full containerization for easy deployment and scaling
+
+---
+
+## � Demo Credentials
+
+### Production Roles (Baron Car Rental Business)
+| Role | Email | Password | Purpose |
+|------|-------|----------|---------|
+| **Manager** | manager@baron.local | Admin123! | Business oversight, odometer settings, approvals |
+| **Accountant** | accountant@baron.local | Admin123! | Financial management, transaction tracking |
+| **Reception** | reception@baron.local | Admin123! | Customer service, booking creation |
+| **Warehouse** | warehouse@baron.local | Admin123! | Fleet logistics, car delivery |
+| **Mechanic** | mechanic@baron.local | Admin123! | Vehicle maintenance |
+
+### Development Role (Testing/Staging Only)
+| Role | Email | Password | Purpose |
+|------|-------|----------|---------|
+| **Admin** | admin@baron.local | Admin123! | **DEV/TESTING ONLY** - System configuration, user management |
+
+> **⚠️ Note:** Admin role is for development and testing purposes only. Change all passwords in production!
+
+---
+
+## 🎯 Latest Features (November 2025)
+
+### ✨ Recent Implementations
+
+1. **Odometer Tracking System** 🚗
+   - Initial odometer reading at booking creation
+   - Final odometer reading at car return
+   - Automatic km calculation and policy enforcement (100 km/day)
+   - Extra km charges (0.5 LYD per km) with pending transactions
+   - Fleet mileage auto-update from completed bookings
+
+2. **Accountant Notification System** 💰
+   - Automatic notifications to accountants on new bookings
+   - Booking details embedded in notifications
+   - Action-required flag for transaction creation
+   - Role-based delivery to all accountant users
+
+3. **Libya Business Context** 🇱🇾
+   - Currency: Libyan Dinar (LYD)
+   - Timezone: Africa/Tripoli (GMT+2)
+   - Calendar: Gregorian format
+   - Language: Arabic (ar-LY locale)
+   - RTL (Right-to-Left) support
+
+4. **Manager Dashboard Enhancements** ⚙️
+   - Exclusive odometer policy configuration
+   - Real-time calculation examples
+   - Collapsible settings panel
+   - System impact information
+
+5. **Fleet Management Updates** 🚙
+   - Sale price column with conditional display
+   - Expected sale price field in car form
+   - Real-time mileage updates from bookings
+   - Status tracking and availability
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│         NEXUS PLATFORM (Control Plane)              │
-│  • Service Discovery    • API Gateway               │
-│  • Health Monitoring    • WebSocket Server          │
-│  • SSH Source Access    • Config Sync               │
-│                                                      │
-│  Ports: 6000 (HTTP), 2222 (SSH), 6001 (WebSocket)  │
-└────────────────┬────────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│         Baron Client (React)            │
+│  • Vite + TypeScript                    │
+│  • Tailwind CSS (RTL Support)           │
+│  • Socket.IO Client                     │
+│  • Arabic Localization                  │
+│                                         │
+│  Port: 5173 (Dev) / 3000 (Prod)       │
+└────────────────┬────────────────────────┘
                  │
-                 │ Platform Orchestration
+                 │ HTTP/WebSocket
                  │
-    ┌────────────┼────────────┐
-    │            │             │
-    ▼            ▼             ▼
-┌────────┐  ┌─────────┐  ┌──────────┐
-│PostgeSQL│  │  Redis  │  │  Baron   │
-│  DB     │  │ Cache   │  │ Backend  │
-│  5432   │  │  6379   │  │  5000    │
-└────────┘  └─────────┘  └─────┬────┘
-                                │
-                                ▼
-                          ┌──────────┐
-                          │  Baron   │
-                          │ Frontend │
-                          │  3000    │
-                          └──────────┘
+┌────────────────▼────────────────────────┐
+│         Baron Backend (Node.js)         │
+│  • Express + TypeScript                 │
+│  • JWT Authentication                   │
+│  • Socket.IO Server                     │
+│  • Prisma ORM                           │
+│  • Role-Based Access Control            │
+│                                         │
+│  Port: 5000                             │
+└────────────────┬────────────────────────┘
+                 │
+                 │ Prisma Client
+                 │
+┌────────────────▼────────────────────────┐
+│         SQLite Database                 │
+│  • Development: dev.db                  │
+│  • Tables: 15+ (users, cars,           │
+│    bookings, transactions, etc.)        │
+│  • Migrations: Prisma Migrate           │
+└─────────────────────────────────────────┘
 ```
 
 ### Technology Stack
 
-#### Platform Layer
-- **Runtime:** Node.js 18+
-- **Framework:** Express.js
-- **Database:** PostgreSQL 15+ (Platform metadata)
-- **Cache:** Redis 7+
-- **SSH Server:** SSH2 (Source code access)
-- **WebSocket:** ws (Real-time communication)
-
-#### Backend (Baron Business Logic)
-- **Runtime:** Node.js 18+
-- **Framework:** Express.js + TypeScript
-- **Database:** PostgreSQL 15+ (Business data)
-- **ORM:** Prisma 5.9
-- **Authentication:** JWT + bcrypt
-- **Real-time:** Socket.io
-- **Jobs:** node-cron
-
-#### Frontend (Baron Client)
+#### Frontend
 - **Framework:** React 18 + TypeScript
 - **Build Tool:** Vite 5
-- **Styling:** Tailwind CSS
-- **State:** React Context API
+- **Styling:** Tailwind CSS (RTL Arabic support)
+- **State Management:** React Context API
 - **HTTP Client:** Axios
+- **Real-time:** Socket.IO Client
+- **Notifications:** React Toastify
 - **Icons:** Lucide React
+- **Forms:** React Hook Form + Zod validation
+- **Date Handling:** date-fns (ar-LY locale)
 
-#### DevOps
-- **Containerization:** Docker + Docker Compose
-- **CI/CD:** GitHub Actions
+#### Backend
+- **Runtime:** Node.js 18+
+- **Framework:** Express.js + TypeScript
+- **Database:** SQLite (dev) / PostgreSQL (prod ready)
+- **ORM:** Prisma 5.22
+- **Authentication:** JWT + bcryptjs
+- **Real-time:** Socket.IO
+- **Validation:** Zod
+- **File Upload:** Multer
+- **Scheduled Jobs:** node-cron
 - **Logging:** Winston
-- **Monitoring:** Health checks + Platform monitoring
+
+#### Database Schema
+- **Users & Roles** - RBAC system
+- **Cars** - Fleet inventory with odometer tracking
+- **Customers** - Customer profiles with documents
+- **Bookings** - Rental bookings with initial/final odometer
+- **Transactions** - Financial records, extra km charges
+- **Maintenance** - Service records and schedules
+- **Notifications** - Role-based notification system
+- **Activity Logs** - Audit trail
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Installation & Setup
 
 ### Prerequisites
-
-- Node.js 18 or higher
-- PostgreSQL 15 or higher
-- Docker Desktop (optional, for containerized deployment)
+- Node.js 18+ and npm
 - Git
 
-### Automated Setup (Recommended)
+### Quick Setup
 
+1. **Clone the repository:**
 ```bash
-# Clone the repository
-git clone https://github.com/asif-mohamed/baron_on_Nexus-Platform.git
-cd baron_on_Nexus-Platform
-
-# Run master setup script (Windows)
-.\master-setup.ps1
-
-# Or for Linux/Mac
-chmod +x master-setup.sh
-./master-setup.sh
+git clone https://github.com/asif-mohamed/Baron-Rental.git
+cd Baron-Rental
 ```
 
-The master setup script will:
-1. ✅ Validate platform folder structure
-2. ✅ Deploy Docker infrastructure
-3. ✅ Create all `.env` files from templates
-4. ✅ Install dependencies
-5. ✅ Run database migrations
-6. ✅ Seed initial data
-7. ✅ Start all services
-
-### Manual Setup
-
-<details>
-<summary>Click to expand manual setup instructions</summary>
-
-#### 1. Install Dependencies
-
-```bash
-# Platform
-cd platform
+2. **Backend Setup:**
+```powershell
+cd server
 npm install
+
+# Generate Prisma client
 npx prisma generate
 
-# Server
-cd ../server
-npm install
-npx prisma generate
+# Run migrations
+npx prisma migrate deploy
 
-# Client
+# Seed demo data
+npm run seed
+```
+
+3. **Frontend Setup:**
+```powershell
 cd ../client
 npm install
 ```
 
-#### 2. Configure Environment
+4. **Start Development:**
 
-```bash
-# Copy environment templates
-cp platform/.env.example platform/.env
-cp server/.env.example server/.env
-cp .env.docker .env.docker
-
-# Edit .env files with your configuration
-```
-
-#### 3. Setup Database
-
-```bash
-# Start PostgreSQL (or use Docker)
-docker compose up -d postgres redis
-
-# Run migrations
-cd server
-npx prisma migrate deploy
-
-cd ../platform
-npx prisma migrate deploy
-
-# Seed data
-cd ../server
-npx ts-node src/seed.ts
-```
-
-#### 4. Start Services
-
-```bash
-# Terminal 1: Platform
-cd platform
-npm run dev
-
-# Terminal 2: Backend
+**Terminal 1 - Backend:**
+```powershell
 cd server
 npm run dev
+```
+Server runs on http://localhost:5000
 
-# Terminal 3: Frontend
-cd client
+**Terminal 2 - Frontend:**
+```powershell
+cd client  
 npm run dev
 ```
-
-</details>
-
-### Docker Deployment
-
-```bash
-# Start all services in Docker
-.\setup-docker.ps1
-
-# Or manually
-docker compose up -d --build
-```
+Frontend runs on http://localhost:5173
 
 ---
 
@@ -212,99 +251,289 @@ docker compose up -d --build
 
 After successful setup:
 
-| Service | URL | Purpose |
-|---------|-----|---------|
-| **Frontend** | http://localhost:3000 | Main application UI |
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Frontend** | http://localhost:5173 | Main application UI |
 | **Backend API** | http://localhost:5000/api | REST API endpoints |
-| **Platform API** | http://localhost:6000 | Control plane API |
-| **Platform Info** | http://localhost:6000/info | Platform details |
-| **Platform SSH** | `ssh admin@localhost -p 2222` | Source code access |
-| **WebSocket** | ws://localhost:6001 | Real-time updates |
-| **PostgreSQL** | localhost:5432 | Database |
-| **Redis** | localhost:6379 | Cache |
+| **API Health** | http://localhost:5000/health | Health check |
 
 ---
 
-## 👤 Default Credentials
+## 🔌 API Endpoints
 
-### Platform Admin (SSH & Platform API Access)
+### Authentication
+- `POST /api/auth/register` - Register new user (Admin only)
+- `POST /api/auth/login` - User login
+- `GET /api/auth/me` - Get current user profile
+- `POST /api/auth/refresh` - Refresh JWT token
 
-| Service | Username | Password |
-|---------|----------|----------|
-| **SSH Server** | `admin` | `Admin123!@#Platform` |
-| **Platform API** | `admin` | `Admin123!@#Platform` |
+### Cars (Fleet Management)
+- `GET /api/cars` - List all cars with filters
+- `GET /api/cars/available` - Get available cars for date range
+- `GET /api/cars/:id` - Get car details
+- `POST /api/cars` - Create new car (Warehouse)
+- `PUT /api/cars/:id` - Update car details
+- `PATCH /api/cars/:id/status` - Update car status
+- `DELETE /api/cars/:id` - Soft delete car
 
-SSH Access:
-```bash
-ssh admin@localhost -p 2222
-# Password: Admin123!@#Platform
-```
+### Customers
+- `GET /api/customers` - List all customers
+- `GET /api/customers/search?q=query` - Search customers
+- `GET /api/customers/:id` - Get customer details
+- `POST /api/customers` - Create new customer (Reception)
+- `PUT /api/customers/:id` - Update customer
+- `DELETE /api/customers/:id` - Soft delete customer
 
-### Baron Application Users
+### Bookings
+- `GET /api/bookings` - List bookings with filters
+- `GET /api/bookings/:id` - Get booking details
+- `POST /api/bookings/check-availability` - Check car availability
+- `POST /api/bookings` - Create booking (with initialOdometer)
+- `PUT /api/bookings/:id` - Update booking
+- `PATCH /api/bookings/:id/pickup` - Mark car as picked up
+- `PATCH /api/bookings/:id/return` - Return car (with finalOdometer, calculates extra km)
+- `PATCH /api/bookings/:id/cancel` - Cancel booking
 
-Default accounts created during seeding:
+### Transactions
+- `GET /api/transactions` - List all transactions
+- `GET /api/transactions/:id` - Get transaction details
+- `POST /api/transactions` - Create transaction (Accountant)
+- `PUT /api/transactions/:id` - Update transaction
+- `DELETE /api/transactions/:id` - Delete transaction
 
-| Role | Email | Password |
-|------|-------|----------|
-| **Admin** | admin@baron.local | Admin123! |
-| **Manager** | manager@baron.local | Admin123! |
-| **Accountant** | accountant@baron.local | Admin123! |
-| **Mechanic** | mechanic@baron.local | Admin123! |
-| **Receptionist** | receptionist@baron.local | Admin123! |
+### Notifications
+- `GET /api/notifications` - Get user's notifications
+- `GET /api/notifications/sent` - Get sent notifications
+- `POST /api/notifications/send` - Send notification to users
+- `PATCH /api/notifications/:id/read` - Mark as read
+- `PATCH /api/notifications/read-all` - Mark all as read
+- `DELETE /api/notifications/:id` - Delete notification
 
-**⚠️ IMPORTANT:** Change these passwords immediately in production!
+### Admin & Configuration
+- `GET /api/admin/business-config` - Get business configuration (Libya settings, odometer policy)
+- `PUT /api/admin/business-config` - Update business configuration (Manager only)
+- `GET /api/users/recipients-list` - Get users for notification recipients
+
+### Maintenance
+- `GET /api/maintenance` - List maintenance records
+- `POST /api/maintenance` - Create maintenance record (Mechanic)
+- `PUT /api/maintenance/:id` - Update maintenance record
+- `DELETE /api/maintenance/:id` - Delete maintenance record
+
+### Reports
+- `GET /api/reports/dashboard` - Dashboard statistics
+- `GET /api/reports/revenue` - Revenue reports
+- `GET /api/reports/fleet-utilization` - Fleet usage statistics
 
 ---
 
 ## 📂 Project Structure
 
 ```
-baron_on_Nexus-platform/
-├── platform/                  # Nexus Platform (Control Plane)
+Baron-Rental/
+├── client/                    # React Frontend
 │   ├── src/
-│   │   ├── controllers/       # Platform API controllers
-│   │   ├── services/          # Background services
-│   │   ├── middleware/        # Auth, logging, error handling
-│   │   └── routes/            # API routes
-│   ├── prisma/                # Platform database schema
-│   └── Dockerfile             # Platform container
+│   │   ├── components/        # Reusable UI components
+│   │   │   ├── dashboards/    # Role-specific dashboards
+│   │   │   └── Layout.tsx     # Main layout with navigation
+│   │   ├── contexts/          # React context providers
+│   │   │   ├── AuthContext.tsx
+│   │   │   └── NotificationContext.tsx
+│   │   ├── lib/               # Utilities
+│   │   │   └── api.ts         # Axios instance
+│   │   ├── pages/             # Page components
+│   │   │   ├── Fleet.tsx      # Fleet management with odometer
+│   │   │   ├── Bookings.tsx   # Booking system with odometer tracking
+│   │   │   ├── Transactions.tsx
+│   │   │   ├── Notifications.tsx
+│   │   │   └── Dashboard.tsx
+│   │   ├── App.tsx            # Main app with routing
+│   │   └── main.tsx           # Entry point
+│   ├── index.html
+│   ├── package.json
+│   ├── tailwind.config.js     # Tailwind with RTL support
+│   └── vite.config.ts
 │
-├── server/                    # Baron Backend
-│   ├── src/
-│   │   ├── controllers/       # Business logic controllers
-│   │   ├── routes/            # API routes
-│   │   ├── middleware/        # Auth, uploads, errors
-│   │   ├── socket/            # WebSocket handlers
-│   │   └── jobs/              # Scheduled jobs
-│   ├── prisma/                # Baron database schema
-│   └── Dockerfile             # Backend container
+└── server/                    # Node.js Backend
+    ├── prisma/
+    │   ├── schema.prisma      # Database schema with odometer fields
+    │   ├── migrations/        # Database migrations
+    │   └── dev.db             # SQLite database (development)
+    ├── src/
+    │   ├── controllers/       # Business logic
+    │   │   ├── booking.controller.ts  # Odometer tracking logic
+    │   │   ├── admin.controller.ts    # Business config
+    │   │   └── ...
+    │   ├── routes/            # API routes
+    │   │   ├── booking.routes.ts
+    │   │   ├── notification.routes.ts
+    │   │   └── ...
+    │   ├── middleware/        # Auth, permissions, errors
+    │   ├── socket/            # Socket.IO real-time
+    │   ├── lib/               # Utilities (Prisma client)
+    │   ├── index.ts           # Server entry point
+    │   └── seed.ts            # Database seeder with odometer data
+    ├── uploads/               # File storage
+    ├── package.json
+    ├── tsconfig.json
+    └── .env
 │
-├── client/                    # Baron Frontend
-│   ├── src/
-│   │   ├── pages/             # React pages
-│   │   ├── components/        # Reusable components
-│   │   ├── context/           # React context
-│   │   └── lib/               # Utilities
-│   └── Dockerfile             # Frontend container (nginx)
-│
-├── baron_Docs/                # Complete documentation
-├── legacy_BINs/               # Archived setup scripts
-├── master-setup.ps1           # Automated setup script
-├── setup-docker.ps1           # Docker deployment script
-├── docker-compose.yml         # Multi-service orchestration
-└── .env.docker                # Docker environment config
+└── baron_Docs/                # Complete Documentation
+    ├── README.md              # Main documentation
+    ├── ACCOUNTANT_NOTIFICATIONS.md
+    ├── FLEET_ODOMETER_UPDATES.md
+    ├── SCHEMA_SEED_UPDATE_SUMMARY.md
+    ├── BETA_DEPLOYMENT_GUIDE.md
+    ├── API_EXAMPLES.md
+    └── ...
 ```
+
+---
+
+## � Project Status
+
+**Current Phase**: 🧪 **BETA TESTING** - Ready for Real User Testing
+
+### Completion Status: 98%
+
+| Module | Status | Notes |
+|--------|--------|-------|
+| Authentication & Authorization | ✅ 100% | JWT, 6 roles, RBAC complete |
+| Dashboard (Multi-role) | ✅ 100% | Admin, Manager, Accountant, Mechanic, Reception, Warehouse |
+| Fleet Management | ✅ 100% | CRUD, odometer tracking, sale price, status tracking |
+| Customer Management | ✅ 100% | CRUD, documents (ID, fingerprint, contracts), search |
+| Booking System | ✅ 100% | Availability check, auto-pricing, odometer tracking (initial/final) |
+| Transactions & Finance | ✅ 100% | Income/expense, extra km charges, Arabic labels |
+| Maintenance System | ✅ 100% | Auto-creation, profiles, history |
+| **Odometer Tracking** | ✅ 100% | **Initial/final readings, extra km calculation, policy enforcement** |
+| **Accountant Notifications** | ✅ 100% | **Auto-notify on new bookings, booking details embedded** |
+| **Libya Localization** | ✅ 100% | **LYD currency, Tripoli timezone, Gregorian calendar** |
+| Notifications | ✅ 100% | Multi-user, role-based, 12+ types, real-time |
+| Reports & Analytics | ✅ 100% | Real-time data, revenue/expense calculations |
+| Employee Management | ✅ 100% | User CRUD, role assignment |
+| Settings | ✅ 100% | Profile, business configuration |
+
+### Recent Engineering Achievements ✨
+
+1. **Odometer Tracking System** (Fully Engineered):
+   - Initial odometer captured at booking creation
+   - Final odometer captured at car return
+   - Automatic km calculation and policy validation (100 km/day)
+   - Extra km charges (0.5 LYD per km) with pending transactions
+   - Fleet mileage auto-updates from completed bookings
+   - Manager-only configuration dashboard
+
+2. **Accountant Notification System** (Fully Implemented):
+   - Automatic notifications on new bookings
+   - Booking details embedded in notification data
+   - Action-required flag for transaction creation
+   - Role-based delivery to all Accountant users
+
+3. **Libya Business Localization**:
+   - Currency: Libyan Dinar (LYD)
+   - Timezone: Africa/Tripoli (GMT+2)
+   - Calendar: Gregorian format
+   - Locale: ar-LY throughout application
+   - RTL (Right-to-Left) support
+
+4. **Database Schema Updates**:
+   - Added `initialOdometer` and `finalOdometer` to Booking model
+   - Migration: `20251118081403_add_odometer_fields`
+   - Seed data includes sample odometer readings and extra km charges
 
 ---
 
 ## 📚 Documentation
 
-Comprehensive documentation available in `baron_Docs/`:
+**📚 Start here**: [baron_Docs/README.md](./baron_Docs/README.md) - Complete documentation navigation guide
 
-- **[MASTER_SETUP_GUIDE.md](baron_Docs/MASTER_SETUP_GUIDE.md)** - Complete setup documentation
-- **[DOCKER_GUIDE.md](baron_Docs/DOCKER_GUIDE.md)** - Docker deployment guide
-- **[PLATFORM_IMPLEMENTATION.md](baron_Docs/PLATFORM_IMPLEMENTATION.md)** - Platform architecture
-- **[API_EXAMPLES.md](baron_Docs/API_EXAMPLES.md)** - API usage examples
+Comprehensive guides available in `baron_Docs/`:
+
+1. **[README.md](baron_Docs/README.md)** - 📍 **START HERE** - Main documentation with quick start
+2. **[ACCOUNTANT_NOTIFICATIONS.md](baron_Docs/ACCOUNTANT_NOTIFICATIONS.md)** - Accountant notification system
+3. **[FLEET_ODOMETER_UPDATES.md](baron_Docs/FLEET_ODOMETER_UPDATES.md)** - Odometer tracking implementation
+4. **[SCHEMA_SEED_UPDATE_SUMMARY.md](baron_Docs/SCHEMA_SEED_UPDATE_SUMMARY.md)** - Database schema updates
+5. **[BETA_DEPLOYMENT_GUIDE.md](baron_Docs/BETA_DEPLOYMENT_GUIDE.md)** - Deployment instructions
+6. **[API_EXAMPLES.md](baron_Docs/API_EXAMPLES.md)** - API usage examples
+7. **[DOCUMENTATION_INDEX.md](baron_Docs/DOCUMENTATION_INDEX.md)** - Complete documentation index
+
+---
+
+## 🧪 Beta Testing Guide
+
+### Test User Accounts
+
+Use the demo credentials above to test different user perspectives:
+- **Admin** - Full system access, user management (dev/testing only)
+- **Manager** - Operations oversight, odometer policy configuration
+- **Reception** - Customer & booking management with odometer tracking
+- **Warehouse** - Fleet operations and car delivery
+- **Accountant** - Financial tracking, transaction creation, booking notifications
+- **Mechanic** - Maintenance records
+
+### Testing Scenarios
+
+Refer to **BETA_DEPLOYMENT_GUIDE.md** for detailed testing workflows:
+1. **Booking Lifecycle with Odometer** (Reception → Warehouse → Return with km tracking)
+2. **Extra Km Charges** (Return car with exceeded mileage → automatic transaction creation → accountant notification)
+3. **Financial Operations** (Accountant receives booking notification → creates transaction)
+4. **Fleet Mileage Updates** (Complete booking → car mileage auto-updates in fleet)
+
+### Feedback Collection
+
+Please report:
+- 🐛 Bugs and errors
+- 💡 Feature requests
+- 🎨 UI/UX improvements
+- ⚡ Performance issues
+- 📱 Mobile responsiveness problems
+
+---
+
+## 🛡️ Security Features
+
+- ✅ JWT-based authentication with refresh tokens
+- ✅ Role-based access control (RBAC) - 6 roles
+- ✅ Password hashing with bcrypt
+- ✅ SQL injection protection (Prisma ORM)
+- ✅ Input validation with Zod
+- ✅ CORS configuration
+- ✅ Environment variable validation
+- ✅ Secure file upload handling
+
+---
+
+## 📄 License
+
+MIT License - Open Source
+
+---
+
+## 👥 Contact
+
+**Repository:** [Baron-Rental](https://github.com/asif-mohamed/Baron-Rental)  
+**Owner:** Asif Mohamed  
+**Email:** a.mohamed121991@outlook.com
+
+---
+
+## 🎯 Roadmap
+
+- [ ] Mobile app (iOS/Android)
+- [ ] GPS tracking integration
+- [ ] Payment gateway integration
+- [ ] Multi-language support (English, French)
+- [ ] Advanced analytics with AI insights
+- [ ] Customer mobile app for self-service
+- [ ] Multi-location/branch support
+
+---
+
+**Version:** 1.0.0-beta  
+**Status:** Beta Testing ✅  
+**Last Updated:** November 18, 2025  
+**Built for:** سلسلة البارون Car Rental Company, Libya 🇱🇾
+
 - **[DEPLOYMENT_GUIDE.md](baron_Docs/BETA_DEPLOYMENT_GUIDE.md)** - Production deployment
 - **[INDEX.md](baron_Docs/INDEX.md)** - Documentation index
 
@@ -333,97 +562,15 @@ npm test
 # Run frontend tests
 cd client
 npm test
-
-# Run platform tests
-cd platform
-npm test
 ```
 
 ---
 
-## 🐳 Docker Services
-
-The Docker Compose setup includes:
-
-- **baron-postgres** - PostgreSQL 15 (Platform + Baron databases)
-- **baron-redis** - Redis 7 (Caching and sessions)
-- **nexus-platform** - Platform control plane (Port 6000, 2222, 6001)
-- **baron-backend** - Baron API server (Port 5000)
-- **baron-frontend** - Baron client app (Port 3000)
-
----
-
-## 🔄 Platform Features
-
-### Service Discovery
-- Automatic discovery of Baron backend on startup
-- Health monitoring every 30 seconds
-- Dynamic service registry updates
-
-### API Routing
-- Platform routes all API requests
-- Load balancing support
-- Request forwarding to appropriate services
-
-### SSH Source Access
-```bash
-ssh admin@localhost -p 2222
-# Password: Admin123!@#Platform
-
-# Available commands:
-ls                  # List files
-cd <directory>      # Change directory
-cat <file>          # View file
-tree                # Directory tree
-help                # Show help
-exit                # Disconnect
-```
-
----
-
-## 📊 Business Modules
-
-### Fleet Management
-- Vehicle inventory and tracking
-- Availability management
-- Vehicle categorization
-- Maintenance history
-
-### Booking System
-- Online reservations
-- Real-time availability check
-- Booking confirmation and tracking
-- Customer booking history
-
-### Financial Management
-- Revenue tracking
-- Invoice generation
-- Payment processing
-- Financial reporting
-
-### Maintenance
-- Service scheduling
-- Repair tracking
-- Parts inventory
-- Maintenance alerts
-
-### Reporting
-- Business intelligence dashboards
-- Revenue reports
-- Fleet utilization
-- Customer analytics
-
----
-
-## 🛠️ Development
+## ️ Development
 
 ### Local Development
 
 ```bash
-# Start platform in dev mode
-cd platform
-npm run dev
-
 # Start backend in dev mode
 cd server
 npm run dev
@@ -436,10 +583,6 @@ npm run dev
 ### Building for Production
 
 ```bash
-# Build platform
-cd platform
-npm run build
-
 # Build backend
 cd server
 npm run build
@@ -451,114 +594,23 @@ npm run build
 
 ---
 
-## 🚢 Deployment
-
-### Production Checklist
-
-- [ ] Update all passwords in `.env` files
-- [ ] Change JWT secrets to strong random values
-- [ ] Configure HTTPS/SSL certificates
-- [ ] Set up firewall rules
-- [ ] Configure automated backups
-- [ ] Review CORS settings
-- [ ] Update SSH credentials
-- [ ] Enable logging and monitoring
-- [ ] Set up CI/CD pipeline
-- [ ] Configure domain names
-
-### Environment Variables
-
-Critical environment variables to configure:
-
-```bash
-# Database
-DATABASE_URL=postgresql://user:pass@host:5432/baron_db
-
-# Authentication
-JWT_SECRET=your-super-secret-jwt-key
-PLATFORM_SECRET=shared-secret-for-platform
-
-# Ports
-BACKEND_PORT=5000
-FRONTEND_PORT=3000
-PLATFORM_PORT=6000
-```
-
----
-
-## 📦 Package Distribution
-
-A clean deployment package is available:
-
-```bash
-# Download baron.zip from releases
-# Extract and run
-.\master-setup.ps1
-```
-
----
-
 ## 🤝 Contributing
 
-This is a proprietary project. Contributions are managed internally.
-
----
-
-## 📄 License
-
-**Proprietary License**
-
-- **Platform Owner:** Asif Mohamed <a.mohamed121991@outlook.com>
-- **Business Instance:** Baron Car Rental Management System
-- **Platform:** Nexus Platform (Multi-tenant SaaS Infrastructure)
-
-This software is proprietary and confidential. Unauthorized copying, modification, distribution, or use is strictly prohibited.
-
----
-
-## 🆘 Support
-
-For issues or questions:
-1. Check documentation in `baron_Docs/`
-2. Review `master-setup.log` for setup issues
-3. Verify all services are running: `docker compose ps`
-4. Check service logs: `docker compose logs <service>`
-
----
-
-## 🎯 Roadmap
-
-- [ ] Mobile app (iOS/Android)
-- [ ] Advanced analytics with AI insights
-- [ ] Multi-location support
-- [ ] Integration with payment gateways
-- [ ] Customer mobile app
-- [ ] Real-time GPS tracking
-- [ ] Automated pricing optimization
-- [ ] Multi-language support
-
----
-
-## 📞 Contact
-
-**Platform Owner:** Asif Mohamed  
-**Email:** a.mohamed121991@outlook.com  
-**GitHub:** [@asif-mohamed](https://github.com/asif-mohamed)  
-**Repository:** [baron_on_Nexus-Platform](https://github.com/asif-mohamed/baron_on_Nexus-Platform)
+This is a proprietary project for Baron Car Rental. Contributions are managed internally.
 
 ---
 
 ## ⭐ Acknowledgments
 
 Built with modern technologies and best practices:
-- React, TypeScript, Node.js, Express
-- PostgreSQL, Prisma, Redis
+- React 18, TypeScript, Node.js, Express
+- SQLite, Prisma ORM
 - Docker, Docker Compose
 - Tailwind CSS, Vite
 - JWT, bcrypt, Winston
 
 ---
 
-**Version:** 1.0.0  
-**Status:** Production Ready ✅  
-**Last Updated:** November 16, 2025
+**Version:** 1.0.0-beta  
+**Status:** Beta Testing ✅  
+**Last Updated:** November 18, 2025
