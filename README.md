@@ -7,7 +7,7 @@
 **A comprehensive car rental management system built with React, TypeScript, Node.js, Express, and Prisma**
 
 > **📥 First time setup?** See [QUICK_START.md](QUICK_START.md) for complete installation guide  
-> **🚀 Need dependencies?** Run `.\install-dependencies.ps1` to install all required packages
+> **🚀 One-command setup:** Run `.\setup.ps1` to install everything automatically
 
 ---
 
@@ -218,31 +218,24 @@ cd Baron-Rental
 cd Baron-Rental-main
 ```
 
-2. **Install all dependencies automatically:**
+2. **Run complete setup (one command):**
 ```powershell
-# This installs dependencies for both backend and frontend
-.\install-dependencies.ps1
+# This does everything: dependencies, database, seeding
+.\setup.ps1
 ```
 
 The script will:
-- ✅ Check Node.js and npm versions
-- ✅ Install backend (server) dependencies
-- ✅ Install frontend (client) dependencies
+- ✅ Check Node.js and npm versions (18+ required)
+- ✅ Install backend dependencies (~150 packages)
+- ✅ Install frontend dependencies (~100 packages)
 - ✅ Generate Prisma Client
-- ✅ Display installation summary
+- ✅ Run database migrations
+- ✅ Seed demo data (6 users + fleet + bookings + transactions)
+- ✅ Display completion summary
 
-3. **Setup database and seed demo data:**
-```powershell
-cd server
+**Duration:** 3-5 minutes
 
-# Run migrations
-npx prisma migrate deploy
-
-# Seed demo data (6 users + fleet + bookings + transactions)
-npm run seed
-```
-
-4. **Start Development:**
+3. **Start the application:**
 
 **Terminal 1 - Backend:**
 ```powershell

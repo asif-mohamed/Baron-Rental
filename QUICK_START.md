@@ -39,36 +39,24 @@ cd Baron-Rental
 
 ---
 
-### Step 2: Install Dependencies
+### Step 2: Run Complete Setup
 
-Run the automated installation script:
+Run the automated setup script (does everything in one command):
 
 ```powershell
-.\install-dependencies.ps1
+.\setup.ps1
 ```
 
 This script will:
-- ✅ Check Node.js version
+- ✅ Check Node.js version (18+ required)
 - ✅ Install backend dependencies (~150 packages)
 - ✅ Install frontend dependencies (~100 packages)
 - ✅ Generate Prisma Client for database
-- ✅ Show installation summary
+- ✅ Run database migrations
+- ✅ Seed demo data (6 users, fleet, bookings, transactions)
+- ✅ Show completion summary
 
-**Expected duration:** 2-5 minutes depending on internet speed
-
----
-
-### Step 3: Setup Database
-
-```powershell
-cd server
-
-# Run database migrations
-npx prisma migrate deploy
-
-# Seed demo data (creates 6 users, fleet, bookings, transactions)
-npm run seed
-```
+**Expected duration:** 3-5 minutes depending on internet speed
 
 **Demo accounts created:**
 - Admin: `admin@baron.ly` / `Admin123!@#`
@@ -80,7 +68,7 @@ npm run seed
 
 ---
 
-### Step 4: Start the Application
+### Step 3: Start the Application
 
 **Open TWO PowerShell terminals:**
 
