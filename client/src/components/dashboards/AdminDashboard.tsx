@@ -36,6 +36,10 @@ interface BusinessConfig {
     secondaryColor: string;
     logoUrl?: string;
   };
+  odometerSettings?: {
+    kmPerDay: number;
+    extraKmCharge: number;
+  };
 }
 
 interface TabConfig {
@@ -76,18 +80,23 @@ const AdminDashboard = () => {
   const [businessConfig, setBusinessConfig] = useState<BusinessConfig>({
     displayName: 'Baron Car Rental',
     displayNameArabic: 'سلسلة البارون',
-    timezone: 'Asia/Riyadh',
-    currency: 'SAR',
+    timezone: 'Africa/Tripoli',
+    currency: 'LYD',
     language: 'ar',
     theme: {
       primaryColor: '#1e3a8a',
       secondaryColor: '#d97706',
+    },
+    odometerSettings: {
+      kmPerDay: 100,
+      extraKmCharge: 0.5,
     }
   });
   const [tabs, setTabs] = useState<TabConfig[]>([]);
   const [roles, setRoles] = useState<RoleConfig[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingBusiness, setEditingBusiness] = useState(false);
+  const [editingRoles, setEditingRoles] = useState(false);
 
   useEffect(() => {
     fetchPlatformData();
@@ -334,27 +343,27 @@ const AdminDashboard = () => {
           </div>
 
           <div className="card">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Platform Configuration Overview</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4" dir="rtl">نظرة عامة على إعدادات المنصة</h3>
             <div className="space-y-3 text-gray-700">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="font-medium">Business Name (English):</span>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg" dir="rtl">
+                <span className="font-medium">اسم الشركة (عربي):</span>
+                <span className="text-primary-700 font-semibold">{businessConfig.displayNameArabic}</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg" dir="rtl">
+                <span className="font-medium">اسم الشركة (إنجليزي):</span>
                 <span className="text-primary-700">{businessConfig.displayName}</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="font-medium">Business Name (Arabic):</span>
-                <span className="text-primary-700">{businessConfig.displayNameArabic}</span>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg" dir="rtl">
+                <span className="font-medium">العملة:</span>
+                <span className="text-primary-700 font-semibold">دينار ليبي ({businessConfig.currency})</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="font-medium">Currency:</span>
-                <span className="text-primary-700">{businessConfig.currency}</span>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg" dir="rtl">
+                <span className="font-medium">المنطقة الزمنية:</span>
+                <span className="text-primary-700">طرابلس ({businessConfig.timezone})</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="font-medium">Timezone:</span>
-                <span className="text-primary-700">{businessConfig.timezone}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span className="font-medium">Last Configuration Change:</span>
-                <span className="text-gray-600">{new Date(stats.lastConfigChange).toLocaleString('ar-SA')}</span>
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg" dir="rtl">
+                <span className="font-medium">آخر تحديث للإعدادات:</span>
+                <span className="text-gray-600">{new Date(stats.lastConfigChange).toLocaleString('ar-LY')}</span>
               </div>
             </div>
           </div>
@@ -438,9 +447,9 @@ const AdminDashboard = () => {
                 disabled={!editingBusiness}
                 className="input"
               >
-                <option value="Asia/Riyadh">Asia/Riyadh (GMT+3)</option>
+                <option value="Africa/Tripoli">Africa/Tripoli (GMT+2)</option>
+                <option value="Africa/Cairo">Africa/Cairo (GMT+2)</option>
                 <option value="Asia/Dubai">Asia/Dubai (GMT+4)</option>
-                <option value="Asia/Kuwait">Asia/Kuwait (GMT+3)</option>
                 <option value="Europe/London">Europe/London (GMT+0)</option>
                 <option value="America/New_York">America/New_York (GMT-5)</option>
               </select>
@@ -454,9 +463,9 @@ const AdminDashboard = () => {
                 disabled={!editingBusiness}
                 className="input"
               >
-                <option value="SAR">SAR - Saudi Riyal</option>
+                <option value="LYD">LYD - Libyan Dinar</option>
                 <option value="AED">AED - UAE Dirham</option>
-                <option value="KWD">KWD - Kuwaiti Dinar</option>
+                <option value="EGP">EGP - Egyptian Pound</option>
                 <option value="USD">USD - US Dollar</option>
                 <option value="EUR">EUR - Euro</option>
               </select>
@@ -613,10 +622,28 @@ const AdminDashboard = () => {
       {/* Roles Management Section */}
       {activeSection === 'roles' && (
         <div className="card">
-          <h3 className="text-xl font-bold text-gray-900 mb-4">Role Management (Configure User Types)</h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-gray-900">Role Management (Configure User Types)</h3>
+            <button
+              onClick={() => setEditingRoles(!editingRoles)}
+              className={`btn-${editingRoles ? 'secondary' : 'primary'} flex items-center gap-2`}
+            >
+              <Edit2 className="w-4 h-4" />
+              {editingRoles ? 'إلغاء التعديل' : 'تعديل الأدوار'}
+            </button>
+          </div>
+          
           <p className="text-gray-600 mb-6">
             Enable or disable user roles for this Baron flavor. Disabled roles cannot be assigned to users.
           </p>
+
+          {!editingRoles && (
+            <div className="mb-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+              <p className="text-sm text-yellow-800">
+                🔒 <strong>View Mode:</strong> Click "تعديل الأدوار" to enable or disable roles.
+              </p>
+            </div>
+          )}
 
           <div className="space-y-3">
             {roles.map((role) => (
@@ -631,10 +658,12 @@ const AdminDashboard = () => {
                 <div className="flex items-center gap-4 flex-1">
                   <button
                     onClick={() => toggleRole(role.id)}
-                    disabled={role.name === 'Admin'}
+                    disabled={role.name === 'Admin' || !editingRoles}
                     className={`p-2 rounded-lg transition-colors ${
                       role.name === 'Admin'
                         ? 'bg-primary-500 text-white cursor-not-allowed'
+                        : !editingRoles
+                        ? 'bg-gray-400 text-white cursor-not-allowed'
                         : role.enabled
                         ? 'bg-purple-500 text-white hover:bg-purple-600'
                         : 'bg-gray-300 text-gray-600 hover:bg-gray-400'

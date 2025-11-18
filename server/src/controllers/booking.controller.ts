@@ -195,6 +195,36 @@ export const createBooking = async (req: AuthRequest, res: Response, next: NextF
       });
     }
 
+    // Get Accountant role ID
+    const accountantRole = await prisma.role.findUnique({
+      where: { name: 'Accountant' },
+    });
+
+    // Create notification for Accountant staff
+    if (accountantRole) {
+      await prisma.notification.create({
+        data: {
+          roleId: accountantRole.id,
+          type: 'booking_created',
+          title: '💰 حجز جديد - يتطلب إنشاء معاملة',
+          message: `حجز جديد #${booking.bookingNumber} للعميل ${booking.customer.fullName} - ${booking.car.brand} ${booking.car.model}. المبلغ الإجمالي: ${totalAmount} د.ل. يرجى إنشاء معاملة مالية لهذا الحجز.`,
+          data: JSON.stringify({ 
+            bookingId: booking.id,
+            bookingNumber: booking.bookingNumber,
+            customerName: booking.customer.fullName,
+            customerId: booking.customerId,
+            carDetails: `${booking.car.brand} ${booking.car.model}`,
+            totalAmount: totalAmount,
+            startDate: start,
+            endDate: end,
+            totalDays: totalDays,
+          }),
+          requiresAction: true,
+          actionType: 'acknowledge',
+        },
+      });
+    }
+
     // Emit socket event
     emitNotification('booking:created', booking);
 
@@ -265,8 +295,39 @@ export const pickupBooking = async (req: AuthRequest, res: Response, next: NextF
 
 export const returnBooking = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { mileage } = req.body;
+    const { finalOdometer, initialOdometer } = req.body;
 
+    // Get booking with car details
+    const existingBooking = await prisma.booking.findUnique({
+      where: { id: req.params.id },
+      include: { car: true },
+    });
+
+    if (!existingBooking) {
+      throw new AppError('Booking not found', 404);
+    }
+
+    // Calculate extra km charge if applicable
+    let extraKm = 0;
+    let extraKmCharge = 0;
+
+    if (finalOdometer && initialOdometer) {
+      const actualKm = finalOdometer - initialOdometer;
+      const totalDays = existingBooking.totalDays;
+
+      // Odometer settings (matching admin.controller.ts config)
+      const kmPerDay = 100;
+      const extraKmChargeRate = 0.5;
+
+      const allowedKm = totalDays * kmPerDay;
+      
+      if (actualKm > allowedKm) {
+        extraKm = actualKm - allowedKm;
+        extraKmCharge = extraKm * extraKmChargeRate;
+      }
+    }
+
+    // Update booking with return details
     const booking = await prisma.booking.update({
       where: { id: req.params.id },
       data: {
@@ -275,16 +336,36 @@ export const returnBooking = async (req: AuthRequest, res: Response, next: NextF
       },
     });
 
-    // Update car status and mileage
+    // Update car status and mileage with the final odometer reading
     await prisma.car.update({
       where: { id: booking.carId },
       data: {
         status: 'available',
-        mileage: mileage || undefined,
+        mileage: finalOdometer || existingBooking.car.mileage,
       },
     });
 
-    res.json({ booking });
+    // If there are extra km charges, create a pending transaction
+    if (extraKmCharge > 0) {
+      const extraKmChargeRate = 0.5;
+      await prisma.transaction.create({
+        data: {
+          bookingId: existingBooking.id,
+          userId: req.user!.id,
+          type: 'expense',
+          category: 'extra_km_charge',
+          amount: extraKmCharge,
+          paymentMethod: 'pending',
+          description: `رسوم إضافية للكيلومترات الزائدة: ${extraKm} كم × ${extraKmChargeRate} د.ل - تجاوز الحد المسموح: ${extraKm} كيلومتر`,
+        },
+      });
+    }
+
+    res.json({ 
+      booking,
+      extraKm,
+      extraKmCharge,
+    });
   } catch (error) {
     next(error);
   }

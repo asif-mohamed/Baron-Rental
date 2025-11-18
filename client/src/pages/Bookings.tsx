@@ -20,6 +20,8 @@ interface Booking {
   status: 'confirmed' | 'active' | 'completed' | 'cancelled';
   pickupDate?: string;
   returnDate?: string;
+  initialOdometer?: number;
+  finalOdometer?: number;
   car: { brand: string; model: string; year: number; plateNumber: string };
   customer: { fullName: string; phone: string };
 }
@@ -62,6 +64,7 @@ const Bookings = () => {
     taxes: 0,
     discount: 0,
     notes: '',
+    initialOdometer: 0,
   });
 
   useEffect(() => {
@@ -122,6 +125,11 @@ const Bookings = () => {
       return;
     }
 
+    if (!formData.initialOdometer || formData.initialOdometer <= 0) {
+      toast.error('يرجى إدخال قراءة العداد الحالية للسيارة');
+      return;
+    }
+
     const startDate = new Date(formData.startDate);
     const endDate = new Date(formData.endDate);
 
@@ -168,7 +176,7 @@ const Bookings = () => {
     if (!window.confirm('هل أنت متأكد من تسليم السيارة للعميل؟')) return;
 
     try {
-      await api.patch(`/api/bookings/${id}/pickup`);
+      await api.patch(`/bookings/${id}/pickup`);
       toast.success('تم تسليم السيارة بنجاح');
       fetchBookings();
     } catch (error: any) {
@@ -177,18 +185,43 @@ const Bookings = () => {
   };
 
   const handleReturn = async (id: string) => {
-    const mileageInput = prompt('أدخل قراءة عداد الكيلومترات الحالية:');
-    if (!mileageInput) return;
+    // Find the booking to get initial odometer and rental period
+    const booking = bookings.find(b => b.id === id);
+    if (!booking) {
+      toast.error('لم يتم العثور على الحجز');
+      return;
+    }
 
-    const actualMileage = parseInt(mileageInput);
-    if (isNaN(actualMileage) || actualMileage < 0) {
+    const finalOdometerInput = prompt('أدخل قراءة عداد الكيلومترات الحالية:');
+    if (!finalOdometerInput) return;
+
+    const finalOdometer = parseInt(finalOdometerInput);
+    if (isNaN(finalOdometer) || finalOdometer < 0) {
       toast.error('قراءة العداد غير صحيحة');
       return;
     }
 
+    // Validate final odometer is greater than initial
+    if (booking.initialOdometer && finalOdometer < booking.initialOdometer) {
+      toast.error(`قراءة العداد النهائية (${finalOdometer} كم) يجب أن تكون أكبر من القراءة الأولية (${booking.initialOdometer} كم)`);
+      return;
+    }
+
     try {
-      await api.patch(`/api/bookings/${id}/return`, { actualMileage });
-      toast.success('تم استلام السيارة بنجاح');
+      const response = await api.patch(`/bookings/${id}/return`, { 
+        finalOdometer,
+        initialOdometer: booking.initialOdometer 
+      });
+      
+      // Check if extra km charge was applied
+      if (response.data.extraKmCharge && response.data.extraKmCharge > 0) {
+        toast.success(`تم استلام السيارة بنجاح\n⚠️ تم إضافة رسوم إضافية: ${response.data.extraKmCharge} د.ل للكيلومترات الزائدة (${response.data.extraKm} كم)`, {
+          autoClose: 5000
+        });
+      } else {
+        toast.success('تم استلام السيارة بنجاح');
+      }
+      
       fetchBookings();
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'فشل استلام السيارة');
@@ -199,7 +232,7 @@ const Bookings = () => {
     if (!window.confirm('هل أنت متأكد من إلغاء هذا الحجز؟')) return;
 
     try {
-      await api.patch(`/api/bookings/${id}`, { status: 'cancelled' });
+      await api.patch(`/bookings/${id}`, { status: 'cancelled' });
       toast.success('تم إلغاء الحجز');
       fetchBookings();
     } catch (error: any) {
@@ -218,6 +251,7 @@ const Bookings = () => {
       taxes: 0,
       discount: 0,
       notes: '',
+      initialOdometer: 0,
     });
   };
 
@@ -580,6 +614,23 @@ const Bookings = () => {
                   />
                 </div>
 
+                {/* قراءة العداد عند الاستلام */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    قراءة العداد الحالية (كم) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    value={formData.initialOdometer || ''}
+                    onChange={(e) => setFormData({ ...formData, initialOdometer: parseInt(e.target.value) || 0 })}
+                    placeholder="مثال: 25000"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">💡 قراءة عداد الكيلومترات الحالية للسيارة عند استلامها</p>
+                </div>
+
                 {/* السعر اليومي */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">السعر اليومي</label>
@@ -808,7 +859,7 @@ const Bookings = () => {
                   <div className="bg-green-50 p-3 rounded-lg">
                     <span className="text-sm text-gray-600">تاريخ التسليم:</span>
                     <p className="font-semibold">
-                      {new Date(selectedBooking.pickupDate).toLocaleString('ar-SA')}
+                      {new Date(selectedBooking.pickupDate).toLocaleString('ar-LY')}
                     </p>
                   </div>
                 </div>
@@ -819,7 +870,7 @@ const Bookings = () => {
                   <div className="bg-blue-50 p-3 rounded-lg">
                     <span className="text-sm text-gray-600">تاريخ الاستلام:</span>
                     <p className="font-semibold">
-                      {new Date(selectedBooking.returnDate).toLocaleString('ar-SA')}
+                      {new Date(selectedBooking.returnDate).toLocaleString('ar-LY')}
                     </p>
                   </div>
                 </div>

@@ -154,27 +154,29 @@ model Customer {
 // ========== BOOKINGS ==========
 
 model Booking {
-  id             String    @id @default(uuid())
-  bookingNumber  String    @unique
-  carId          String
-  customerId     String
-  userId         String    // who created the booking
-  startDate      DateTime
-  endDate        DateTime
-  pickupDate     DateTime?
-  returnDate     DateTime?
-  totalDays      Int
-  dailyRate      Float
-  subtotal       Float
-  extras         Float     @default(0)
-  taxes          Float     @default(0)
-  discount       Float     @default(0)
-  totalAmount    Float
-  paidAmount     Float     @default(0)
-  status         String    @default("pending") // pending, confirmed, active, completed, cancelled
-  notes          String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id              String    @id @default(uuid())
+  bookingNumber   String    @unique
+  carId           String
+  customerId      String
+  userId          String    // who created the booking
+  startDate       DateTime
+  endDate         DateTime
+  pickupDate      DateTime?
+  returnDate      DateTime?
+  totalDays       Int
+  dailyRate       Float
+  subtotal        Float
+  extras          Float     @default(0)
+  taxes           Float     @default(0)
+  discount        Float     @default(0)
+  totalAmount     Float
+  paidAmount      Float     @default(0)
+  initialOdometer Int?      // Odometer reading at pickup
+  finalOdometer   Int?      // Odometer reading at return
+  status          String    @default("pending") // pending, confirmed, active, completed, cancelled
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   car          Car           @relation(fields: [carId], references: [id])
   customer     Customer      @relation(fields: [customerId], references: [id])

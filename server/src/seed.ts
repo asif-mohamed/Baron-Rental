@@ -562,6 +562,7 @@ async function main() {
         paidAmount: 1000,
         status: 'active',
         pickupDate: tomorrow,
+        initialOdometer: 12000, // Matches car's current mileage
       },
     }),
     prisma.booking.create({
@@ -626,6 +627,8 @@ async function main() {
         totalAmount: 1207.5,
         paidAmount: 1207.5,
         status: 'completed',
+        initialOdometer: 11600,
+        finalOdometer: 12000, // 400km driven in 4 days (100km/day allowed)
       },
     }),
     prisma.booking.create({
@@ -645,6 +648,8 @@ async function main() {
         totalAmount: 1349,
         paidAmount: 1349,
         status: 'completed',
+        initialOdometer: 27200,
+        finalOdometer: 28000, // 800km driven in 7 days (exceeded by 100km)
       },
     }),
     // Reception's bookings (moderate performer)
@@ -665,6 +670,7 @@ async function main() {
         totalAmount: 1293.75,
         paidAmount: 500,
         status: 'active',
+        initialOdometer: 3000, // Active rental, no final odometer yet
       },
     }),
   ]);
@@ -692,6 +698,18 @@ async function main() {
         amount: 1349,
         paymentMethod: 'bank_transfer',
         description: 'دفع كامل للحجز',
+        transactionDate: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.transaction.create({
+      data: {
+        bookingId: additionalBookings[1].id,
+        userId: managerUser!.id,
+        type: 'expense',
+        category: 'extra_km_charge',
+        amount: 50, // 100km excess × 0.5 LYD
+        paymentMethod: 'pending',
+        description: 'رسوم إضافية للكيلومترات الزائدة: 100 كم × 0.5 د.ل - تجاوز الحد المسموح: 100 كيلومتر',
         transactionDate: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
       },
     }),

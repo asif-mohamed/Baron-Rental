@@ -335,6 +335,7 @@ const Fleet = () => {
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الأميال</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">رقم اللوحة</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">السعر/يوم</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">سعر البيع</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الإجراءات</th>
               </tr>
             </thead>
@@ -352,6 +353,13 @@ const Fleet = () => {
                   <td className="px-6 py-4 whitespace-nowrap">{car.mileage.toLocaleString()} كم</td>
                   <td className="px-6 py-4 whitespace-nowrap">{car.plateNumber}</td>
                   <td className="px-6 py-4 whitespace-nowrap font-semibold">{car.dailyRate} د.ل</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {car.purchasePrice && car.purchasePrice > 0 ? (
+                      <span className="font-semibold text-purple-700">{car.purchasePrice.toLocaleString()} د.ل</span>
+                    ) : (
+                      <span className="text-xs text-gray-500 italic">غير معروض للبيع</span>
+                    )}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex gap-2">
                       <button
@@ -524,6 +532,20 @@ const Fleet = () => {
                     onChange={(e) => setFormData({ ...formData, dailyRate: parseFloat(e.target.value) })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">سعر البيع المتوقع (د.ل) - اختياري</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.purchasePrice || ''}
+                    onChange={(e) => setFormData({ ...formData, purchasePrice: e.target.value ? parseFloat(e.target.value) : 0 })}
+                    placeholder="اترك فارغاً إذا لم تكن السيارة معروضة للبيع"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">💡 سيتم عرض هذا السعر في عمود "سعر البيع" بجدول الأسطول</p>
                 </div>
 
                 <div>

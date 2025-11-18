@@ -465,7 +465,7 @@ const Dashboard = () => {
                     </p>
                     <p className="text-xs text-gray-500">
                       <time dateTime={notification.createdAt}>
-                        ⏰ {new Date(notification.createdAt).toLocaleString('ar-SA')}
+                        ⏰ {new Date(notification.createdAt).toLocaleString('ar-LY')}
                       </time>
                     </p>
                   </div>

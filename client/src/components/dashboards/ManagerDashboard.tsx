@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp, DollarSign, Users, Car, CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { TrendingUp, DollarSign, Users, Car, CheckCircle, AlertCircle, Clock, Settings, Save } from 'lucide-react';
 import api from '../../lib/api';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 interface ManagerStats {
   totalRevenue: number;
@@ -39,9 +40,15 @@ const ManagerDashboard = () => {
   });
 
   const [pendingApprovals, setPendingApprovals] = useState<PendingApproval[]>([]);
+  const [showSettings, setShowSettings] = useState(false);
+  const [odometerSettings, setOdometerSettings] = useState({
+    kmPerDay: 100,
+    extraKmCharge: 0.5,
+  });
 
   useEffect(() => {
     fetchManagerData();
+    fetchOdometerSettings();
   }, []);
 
   const fetchManagerData = async () => {
@@ -61,6 +68,27 @@ const ManagerDashboard = () => {
       setPendingApprovals(data.approvals || []);
     } catch (error) {
       console.error('Failed to fetch manager data:', error);
+    }
+  };
+
+  const fetchOdometerSettings = async () => {
+    try {
+      const { data } = await api.get('/admin/business-config');
+      if (data.config.odometerSettings) {
+        setOdometerSettings(data.config.odometerSettings);
+      }
+    } catch (error) {
+      console.error('Failed to fetch odometer settings:', error);
+    }
+  };
+
+  const handleSaveOdometerSettings = async () => {
+    try {
+      await api.put('/admin/business-config', { odometerSettings });
+      toast.success('تم حفظ إعدادات العداد بنجاح');
+      setShowSettings(false);
+    } catch (error) {
+      toast.error('فشل حفظ الإعدادات');
     }
   };
 
@@ -85,10 +113,93 @@ const ManagerDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">لوحة المدير</h1>
-        <p className="text-gray-600">مرحباً {user?.fullName} - نظرة شاملة على الأداء والعمليات</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">لوحة المدير</h1>
+          <p className="text-gray-600">مرحباً {user?.fullName} - نظرة شاملة على الأداء والعمليات</p>
+        </div>
+        <button
+          onClick={() => setShowSettings(!showSettings)}
+          className="btn-primary flex items-center gap-2"
+        >
+          <Settings className="w-4 h-4" />
+          {showSettings ? 'إخفاء الإعدادات' : 'إعدادات العداد'}
+        </button>
       </div>
+
+      {/* Odometer Settings Panel */}
+      {showSettings && (
+        <div className="card bg-gradient-to-br from-purple-50 to-blue-50 border-2 border-purple-200">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-gray-900">⚙️ إعدادات العداد والكيلومترات</h3>
+            <button
+              onClick={handleSaveOdometerSettings}
+              className="btn-primary flex items-center gap-2"
+            >
+              <Save className="w-4 h-4" />
+              حفظ التغييرات
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                الحد المسموح من الكيلومترات في اليوم
+              </label>
+              <input
+                type="number"
+                min="1"
+                step="1"
+                value={odometerSettings.kmPerDay}
+                onChange={(e) => setOdometerSettings({ 
+                  ...odometerSettings, 
+                  kmPerDay: parseInt(e.target.value) || 100 
+                })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="100"
+              />
+              <p className="text-xs text-gray-500 mt-1">عدد الكيلومترات المسموح بها يومياً لكل حجز</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                تكلفة الكيلومتر الإضافي (د.ل)
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={odometerSettings.extraKmCharge}
+                onChange={(e) => setOdometerSettings({ 
+                  ...odometerSettings, 
+                  extraKmCharge: parseFloat(e.target.value) || 0.5 
+                })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                placeholder="0.5"
+              />
+              <p className="text-xs text-gray-500 mt-1">المبلغ المحتسب عن كل كيلومتر إضافي يتجاوز الحد المسموح</p>
+            </div>
+          </div>
+
+          <div className="mt-6 p-4 bg-purple-100 border-l-4 border-purple-500 rounded">
+            <p className="text-sm text-purple-900">
+              <strong>💰 مثال حسابي:</strong> إذا كان الحجز لمدة 5 أيام والحد المسموح هو {odometerSettings.kmPerDay} كم/يوم، 
+              فالمجموع المسموح = {odometerSettings.kmPerDay * 5} كم. 
+              إذا سار العميل 600 كم، فالكيلومترات الإضافية = 100 كم، والرسوم = {100 * odometerSettings.extraKmCharge} د.ل
+            </p>
+          </div>
+
+          <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+            <p className="text-sm text-blue-900">
+              <strong>🔄 التأثير على النظام:</strong>
+              <br />✅ يتم احتساب الرسوم تلقائياً عند إرجاع السيارة
+              <br />✅ تظهر الرسوم كمعاملة معلقة في صفحة المعاملات
+              <br />✅ يتم تحديث قراءة العداد في صفحة الأسطول
+              <br />✅ يمكن للمدير الموافقة أو الإعفاء من الرسوم
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

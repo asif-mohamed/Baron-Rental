@@ -45,12 +45,16 @@ export const getBusinessConfig = async (req: AuthRequest, res: Response, next: N
     const config = {
       displayName: 'Baron Car Rental',
       displayNameArabic: 'سلسلة البارون',
-      timezone: 'Asia/Riyadh',
-      currency: 'SAR',
+      timezone: 'Africa/Tripoli',
+      currency: 'LYD',
       language: 'ar',
       theme: {
         primaryColor: '#1e3a8a',
         secondaryColor: '#d97706',
+      },
+      odometerSettings: {
+        kmPerDay: 100,
+        extraKmCharge: 0.5,
       },
     };
 
