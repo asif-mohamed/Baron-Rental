@@ -112,15 +112,17 @@ function Install-BackendDependencies {
         }
         
         Write-Info "Installing packages (this may take 2-3 minutes)..."
-        $output = npm install 2>&1
+        
+        # Run npm install and capture exit code (ignore stderr warnings)
+        $null = npm install 2>&1
         
         if ($LASTEXITCODE -eq 0) {
             $packageCount = (Get-Content package.json | ConvertFrom-Json).dependencies.PSObject.Properties.Count
             Write-Success "Installed $packageCount backend packages"
         } else {
             Write-Error-Custom "Failed to install backend dependencies"
-            Write-Host $output -ForegroundColor Red
-            exit 1
+            Write-Host "  npm install exited with code: $LASTEXITCODE" -ForegroundColor Red
+            throw "Backend dependency installation failed"
         }
     } finally {
         Pop-Location
@@ -145,15 +147,17 @@ function Install-FrontendDependencies {
         }
         
         Write-Info "Installing packages (this may take 2-3 minutes)..."
-        $output = npm install 2>&1
+        
+        # Run npm install and capture exit code (ignore stderr warnings)
+        $null = npm install 2>&1
         
         if ($LASTEXITCODE -eq 0) {
             $packageCount = (Get-Content package.json | ConvertFrom-Json).dependencies.PSObject.Properties.Count
             Write-Success "Installed $packageCount frontend packages"
         } else {
             Write-Error-Custom "Failed to install frontend dependencies"
-            Write-Host $output -ForegroundColor Red
-            exit 1
+            Write-Host "  npm install exited with code: $LASTEXITCODE" -ForegroundColor Red
+            throw "Frontend dependency installation failed"
         }
     } finally {
         Pop-Location
@@ -168,7 +172,7 @@ function Setup-Prisma {
     
     try {
         Write-Info "Generating Prisma Client..."
-        $output = npx prisma generate 2>&1
+        $null = npx prisma generate 2>&1
         
         if ($LASTEXITCODE -eq 0) {
             Write-Success "Prisma Client generated"
@@ -188,7 +192,7 @@ function Setup-Database {
     
     try {
         Write-Info "Running database migrations..."
-        $output = npx prisma migrate deploy 2>&1
+        $null = npx prisma migrate deploy 2>&1
         
         if ($LASTEXITCODE -eq 0) {
             Write-Success "Database migrations applied"
@@ -197,7 +201,7 @@ function Setup-Database {
         }
         
         Write-Info "Seeding database with demo data..."
-        $output = npm run seed 2>&1
+        $null = npm run seed 2>&1
         
         if ($LASTEXITCODE -eq 0) {
             Write-Success "Database seeded with demo data"
