@@ -94,9 +94,45 @@ function Test-Prerequisites {
     Write-Success "Directory structure verified"
 }
 
+# Setup Environment Files
+function Setup-EnvironmentFiles {
+    Write-Step "Setting up Environment Files" 2 6
+    
+    # Backend .env
+    if (-not (Test-Path "$script:rootPath\server\.env")) {
+        Write-Info "Creating backend .env file..."
+        
+        $backendEnv = @"
+DATABASE_URL="file:./dev.db"
+JWT_SECRET="your-secret-key-change-this-in-production"
+PORT=5000
+NODE_ENV=development
+"@
+        
+        Set-Content -Path "$script:rootPath\server\.env" -Value $backendEnv -Encoding UTF8
+        Write-Success "Backend .env created"
+    } else {
+        Write-Info "Backend .env already exists (skipped)"
+    }
+    
+    # Frontend .env
+    if (-not (Test-Path "$script:rootPath\client\.env")) {
+        Write-Info "Creating frontend .env file..."
+        
+        $frontendEnv = @"
+VITE_API_URL=http://localhost:5000
+"@
+        
+        Set-Content -Path "$script:rootPath\client\.env" -Value $frontendEnv -Encoding UTF8
+        Write-Success "Frontend .env created"
+    } else {
+        Write-Info "Frontend .env already exists (skipped)"
+    }
+}
+
 # Install Backend Dependencies
 function Install-BackendDependencies {
-    Write-Step "Installing Backend Dependencies" 2 6
+    Write-Step "Installing Backend Dependencies" 3 6
     
     Push-Location "$script:rootPath\server"
     
@@ -137,7 +173,7 @@ function Install-BackendDependencies {
 
 # Install Frontend Dependencies
 function Install-FrontendDependencies {
-    Write-Step "Installing Frontend Dependencies" 3 6
+    Write-Step "Installing Frontend Dependencies" 4 6
     
     Push-Location "$script:rootPath\client"
     
@@ -178,7 +214,7 @@ function Install-FrontendDependencies {
 
 # Setup Prisma
 function Setup-Prisma {
-    Write-Step "Setting up Prisma ORM" 4 6
+    Write-Step "Setting up Prisma ORM" 5 6
     
     Push-Location "$script:rootPath\server"
     
@@ -205,7 +241,7 @@ function Setup-Prisma {
 
 # Setup Database
 function Setup-Database {
-    Write-Step "Setting up Database" 5 6
+    Write-Step "Setting up Database" 6 6
     
     Push-Location "$script:rootPath\server"
     
@@ -292,6 +328,7 @@ function Show-Summary {
 # Main Execution
 try {
     Test-Prerequisites
+    Setup-EnvironmentFiles
     Install-BackendDependencies
     Install-FrontendDependencies
     Setup-Prisma
