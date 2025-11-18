@@ -729,6 +729,296 @@ async function main() {
 
   console.log('✅ Additional employee bookings and transactions created');
 
+  // Get all users for notifications
+  const accountantUser = await prisma.user.findUnique({ where: { email: 'accountant@baron.local' } });
+  const mechanicUser = await prisma.user.findUnique({ where: { email: 'mechanic@baron.local' } });
+  const allUsers = [adminUser, managerUser!, receptionUser!, warehouseUser!, accountantUser!, mechanicUser!];
+
+  // Create Demo Notifications for all users
+  console.log('Creating demo notifications for all users...');
+
+  // Admin notifications
+  await Promise.all([
+    prisma.notification.create({
+      data: {
+        userId: adminUser.id,
+        senderId: managerUser!.id,
+        type: 'user_message',
+        title: 'طلب موافقة على التوسع',
+        message: 'نحتاج موافقتك على خطة افتتاح فرع جديد في طرابلس. الميزانية المطلوبة: 250,000 د.ل',
+        requiresAction: true,
+        actionType: 'approve',
+        isRead: false,
+        createdAt: new Date(now.getTime() - 2 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        userId: adminUser.id,
+        type: 'maintenance_due',
+        title: 'صيانة مستحقة - تويوتا كامري',
+        message: 'سيارة تويوتا كامري (أ ب ج 1234) تحتاج صيانة دورية. المسافة المقطوعة: 15,000 كم',
+        data: JSON.stringify({ carId: cars[0].id, mileage: 15000 }),
+        isRead: true,
+        createdAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        userId: adminUser.id,
+        senderId: accountantUser!.id,
+        type: 'user_message',
+        title: 'تقرير مالي شهري',
+        message: 'تم إنشاء التقرير المالي لشهر نوفمبر. الإيرادات: 45,250 د.ل | المصروفات: 12,800 د.ل',
+        isRead: false,
+        createdAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000),
+      },
+    }),
+  ]);
+
+  // Manager notifications
+  await Promise.all([
+    prisma.notification.create({
+      data: {
+        userId: managerUser!.id,
+        type: 'booking_created',
+        title: 'حجز جديد - BK-202411-006',
+        message: 'تم إنشاء حجز جديد بواسطة موظفة الاستقبال. العميل: محمد الصادق | المبلغ: 1,575 د.ل',
+        data: JSON.stringify({ bookingNumber: 'BK-202411-006', customerName: 'محمد الصادق' }),
+        isRead: false,
+        createdAt: new Date(now.getTime() - 30 * 60 * 1000),
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        userId: managerUser!.id,
+        senderId: warehouseUser!.id,
+        type: 'car_pickup_needed',
+        title: 'سيارة جاهزة للتسليم',
+        message: 'هيونداي توسان (د هـ و 5678) جاهزة للتسليم بعد الصيانة. يرجى إخطار العميل',
+        data: JSON.stringify({ carId: cars[1].id }),
+        requiresAction: true,
+        actionType: 'confirm',
+        isRead: false,
+        createdAt: new Date(now.getTime() - 1 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        userId: managerUser!.id,
+        type: 'overdue',
+        title: 'حجز متأخر - BK-202411-002',
+        message: 'الحجز BK-202411-002 متأخر يومين عن موعد الإرجاع المتوقع',
+        data: JSON.stringify({ bookingNumber: 'BK-202411-002', daysOverdue: 2 }),
+        isRead: true,
+        createdAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        userId: managerUser!.id,
+        senderId: adminUser.id,
+        type: 'user_message',
+        title: 'موافقة على طلب الإجازة',
+        message: 'تمت الموافقة على طلب إجازتك من 25-30 نوفمبر. استمتع بوقتك!',
+        isRead: false,
+        createdAt: new Date(now.getTime() - 4 * 60 * 60 * 1000),
+      },
+    }),
+  ]);
+
+  // Reception notifications
+  await Promise.all([
+    prisma.notification.create({
+      data: {
+        userId: receptionUser!.id,
+        type: 'pickup_due',
+        title: 'استلام سيارة اليوم - BK-202411-007',
+        message: 'العميل أحمد بن سعيد لديه موعد استلام سيارة نيسان سنترا اليوم الساعة 2:00 مساءً',
+        data: JSON.stringify({ bookingNumber: 'BK-202411-007', time: '14:00' }),
+        requiresAction: true,
+        actionType: 'confirm',
+        isRead: false,
+        createdAt: new Date(now.getTime() - 2 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        userId: receptionUser!.id,
+        senderId: managerUser!.id,
+        type: 'user_message',
+        title: 'أداء ممتاز هذا الشهر!',
+        message: 'عمل رائع! لقد أتممت 23 حجزاً هذا الشهر بمعدل رضا عملاء 4.8/5. استمري!',
+        isRead: false,
+        createdAt: new Date(now.getTime() - 6 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        userId: receptionUser!.id,
+        type: 'booking_created',
+        title: 'تأكيد حجز - BK-202411-005',
+        message: 'تم تأكيد الحجز BK-202411-005 بنجاح. موعد الاستلام: غداً',
+        data: JSON.stringify({ bookingNumber: 'BK-202411-005' }),
+        isRead: true,
+        createdAt: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000),
+      },
+    }),
+  ]);
+
+  // Warehouse notifications
+  await Promise.all([
+    prisma.notification.create({
+      data: {
+        userId: warehouseUser!.id,
+        senderId: mechanicUser!.id,
+        type: 'car_pickup_needed',
+        title: 'سيارة جاهزة من الصيانة',
+        message: 'كيا سبورتاج (ز ح ط 9012) انتهت صيانتها وجاهزة للنقل إلى المستودع',
+        data: JSON.stringify({ carId: cars[2].id }),
+        requiresAction: true,
+        actionType: 'acknowledge',
+        isRead: false,
+        createdAt: new Date(now.getTime() - 45 * 60 * 1000),
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        userId: warehouseUser!.id,
+        type: 'maintenance_due',
+        title: 'فحص دوري مطلوب',
+        message: 'شيفروليه ماليبو (ك ل م 3456) تحتاج فحص دوري. المسافة: 34,500 كم',
+        data: JSON.stringify({ carId: cars[3].id }),
+        isRead: false,
+        createdAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        userId: warehouseUser!.id,
+        senderId: managerUser!.id,
+        type: 'user_message',
+        title: 'خطة تحسين الأداء',
+        message: 'تم إنشاء خطة تحسين أداء لك. يرجى مراجعتها في قسم الخطط التطويرية',
+        requiresAction: true,
+        actionType: 'acknowledge',
+        isRead: true,
+        createdAt: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
+      },
+    }),
+  ]);
+
+  // Accountant notifications
+  await Promise.all([
+    prisma.notification.create({
+      data: {
+        userId: accountantUser!.id,
+        type: 'user_message',
+        title: 'دفعة جديدة مستلمة',
+        message: 'تم استلام دفعة نقدية بقيمة 1,207.5 د.ل للحجز BK-202411-003. يرجى المراجعة',
+        data: JSON.stringify({ amount: 1207.5, bookingNumber: 'BK-202411-003' }),
+        requiresAction: true,
+        actionType: 'acknowledge',
+        isRead: false,
+        createdAt: new Date(now.getTime() - 3 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        userId: accountantUser!.id,
+        senderId: managerUser!.id,
+        type: 'user_message',
+        title: 'طلب تقرير مالي ربع سنوي',
+        message: 'يرجى إعداد التقرير المالي للربع الرابع من 2024. الموعد النهائي: 5 ديسمبر',
+        requiresAction: true,
+        actionType: 'acknowledge',
+        isRead: false,
+        createdAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        userId: accountantUser!.id,
+        type: 'user_message',
+        title: 'رسوم تأخير مستحقة',
+        message: 'الحجز BK-202411-002 لديه رسوم تأخير 200 د.ل لم يتم تحصيلها بعد',
+        data: JSON.stringify({ bookingNumber: 'BK-202411-002', lateFee: 200 }),
+        isRead: true,
+        createdAt: new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000),
+      },
+    }),
+  ]);
+
+  // Mechanic notifications
+  await Promise.all([
+    prisma.notification.create({
+      data: {
+        userId: mechanicUser!.id,
+        type: 'maintenance_due',
+        title: 'صيانة عاجلة - تويوتا كامري',
+        message: 'تويوتا كامري (أ ب ج 1234) تحتاج صيانة عاجلة. تم الإبلاغ عن صوت غريب في المحرك',
+        data: JSON.stringify({ carId: cars[0].id, priority: 'urgent' }),
+        requiresAction: true,
+        actionType: 'acknowledge',
+        isRead: false,
+        createdAt: new Date(now.getTime() - 1 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        userId: mechanicUser!.id,
+        senderId: warehouseUser!.id,
+        type: 'user_message',
+        title: 'سيارة جديدة للفحص',
+        message: 'هيونداي توسان (د هـ و 5678) في انتظارك للفحص الدوري. موقعها: ورشة A',
+        requiresAction: true,
+        actionType: 'acknowledge',
+        isRead: false,
+        createdAt: new Date(now.getTime() - 5 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        userId: mechanicUser!.id,
+        type: 'user_message',
+        title: 'قطع غيار وصلت',
+        message: 'قطع الغيار المطلوبة لصيانة كيا سبورتاج وصلت. يمكنك البدء بالعمل',
+        isRead: true,
+        createdAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000),
+      },
+    }),
+  ]);
+
+  // Role-based notifications (for all users of certain roles)
+  await Promise.all([
+    prisma.notification.create({
+      data: {
+        roleId: managerRole.id,
+        senderId: adminUser.id,
+        type: 'user_message',
+        title: 'اجتماع الإدارة الشهري',
+        message: 'اجتماع الإدارة الشهري سيعقد يوم الأحد 24 نوفمبر الساعة 10:00 صباحاً',
+        requiresAction: true,
+        actionType: 'acknowledge',
+        isRead: false,
+        createdAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.notification.create({
+      data: {
+        roleId: warehouseRole.id,
+        senderId: managerUser!.id,
+        type: 'user_message',
+        title: 'تحديث نظام الجرد',
+        message: 'سيتم تحديث نظام الجرد غداً. يرجى حفظ جميع البيانات قبل الساعة 11:00 مساءً',
+        isRead: false,
+        createdAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000),
+      },
+    }),
+  ]);
+
+  console.log('✅ Demo notifications created for all users');
+
   // Create Sample Business Plans
   const businessPlans = await Promise.all([
     // 1. Employee Improvement Plan for Warehouse user
